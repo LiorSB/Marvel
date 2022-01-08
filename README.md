@@ -1,7 +1,7 @@
 # Marvel
 **Project Background-**
 
-Marvel is a program that can scan for several ports through a local network and make a connection. The program may recieve a list of IP's, check their connectivity and display in different tabs those that managed to make a connection and those that failed. After making a connection, Marvel will scan every computer for artifacts and later process and parse them, which will later be uploaded to the main machince/cloud.
+Marvel is a desktop application that can scan for several ports through a local network and make a connection with a chosen protocol. You can enter IPs into the program manually, with auto IP scanner, a file that holds IPs or a segment to scan. The program will check the IP's connectivity and display in different tabs those that managed to make a connection and those that failed. After making a connection, Marvel will scan every computer for artifacts and later process and parse them, which will later be uploaded to the main machince/cloud.
 
 **Project's Target-**
 
