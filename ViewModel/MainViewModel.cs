@@ -9,25 +9,38 @@ using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using Marvel.Enum;
 using Marvel.ProtocolCommands;
+using System.Threading.Tasks;
+using Marvel.Model;
 
-namespace Marvel
+namespace Marvel.ViewModel
 {
     public class MainViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
+        public event EventHandler OnHostAdded;
+
         private string _ip = "";
         private string _username = "";
         private string _password = "";
         private string _segment = "";
         private string _fromDirectory = "";
         private string _toDirectory = "";
+
         private IEnumerable<ProtocolsEnum> _protocols = null;
         private ProtocolsEnum _selectedProtocol;
+
         private IEnumerable<CommandsEnum> _commands = null;
         private CommandsEnum _selectedCommand;
+
         private ObservableCollection<Host> _hostList = new();
+
         private WinRMCommands _winRMCommands = new();
-        
+        private SMBCommands _smbCommands = new();
+        private SSHCommands _sshCommands = new();
+
+        private Host _selectedHost;
+
+
         public IEnumerable<ProtocolsEnum> Protocols
         {
             get
@@ -90,6 +103,19 @@ namespace Marvel
             }
         }
 
+        public Host SelectedHost
+        {
+            get
+            {
+                return _selectedHost;
+            }
+            set
+            {
+                _selectedHost = value;
+                NotifyPropertyChanged();
+            }
+        }
+
         public MainViewModel()
         {
             AddHostCommand = new DelegateCommand(AddHost, CanAddHost);
@@ -109,7 +135,7 @@ namespace Marvel
             }
             set
             {
-                _ip = value;
+                _ip = value.Trim();
                 NotifyPropertyChanged();
             }
         }
@@ -122,7 +148,7 @@ namespace Marvel
             }
             set
             {
-                _username = value;
+                _username = value.Trim();
                 NotifyPropertyChanged();
             }
         }
@@ -135,7 +161,7 @@ namespace Marvel
             }
             set
             {
-                _password = value;
+                _password = value.Trim();
                 NotifyPropertyChanged();
             }
         }
@@ -148,7 +174,7 @@ namespace Marvel
             }
             set
             {
-                _segment = value;
+                _segment = value.Trim();
                 NotifyPropertyChanged();
             }
         }
@@ -219,6 +245,7 @@ namespace Marvel
             IP = string.Empty;
             Username = string.Empty;
             Password = string.Empty;
+            OnHostAdded?.Invoke(this, new EventArgs());
         }
 
         private bool CanScanSegment()
@@ -319,27 +346,44 @@ namespace Marvel
 
         private void RunCommand()
         {
-            string result = "";
-             
             switch (_selectedProtocol)
             {
                 case ProtocolsEnum.WinRM:
-                    result = _winRMCommands.Commands(_hostList[0], _fromDirectory, _toDirectory, _selectedCommand);
+                    for (int i = 0; i < _hostList.Count; i++)
+                    {
+                        if (_hostList[i].IsSelected)
+                        {
+                            int index = i;
+                            Task.Run(() => HostList[index].Details += _winRMCommands.Commands(_hostList[index], _fromDirectory, _toDirectory, _selectedCommand) + "\n");
+                        }
+                    }
+
                     break;
                 case ProtocolsEnum.SMB:
+                    for (int i = 0; i < _hostList.Count; i++)
+                    {
+                        if (_hostList[i].IsSelected)
+                        {
+                            int index = i;
+                            Task.Run(() => HostList[index].Details += _smbCommands.Commands(_hostList[index], _fromDirectory, _toDirectory, _selectedCommand) + "\n");
+                        }
+                    }
+
                     break;
                 case ProtocolsEnum.SSH:
+                    for (int i = 0; i < _hostList.Count; i++)
+                    {
+                        if (_hostList[i].IsSelected)
+                        {
+                            int index = i;
+                            Task.Run(() => HostList[index].Details += _sshCommands.Commands(_hostList[index], _fromDirectory, _toDirectory, _selectedCommand) + "\n");
+                        }
+                    }
+
                     break;
                 default:
                     break;   
             }
-
-            if (result == null)
-            {
-                return;
-            }
-
-            _hostList[0].Details += result + "\n";
         }
 
         private bool CanRemoveHost(Host host)

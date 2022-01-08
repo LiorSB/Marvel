@@ -1,4 +1,5 @@
 ﻿using Marvel.Enum;
+using Marvel.Model;
 using System;
 using System.Collections.ObjectModel;
 using System.Management.Automation;

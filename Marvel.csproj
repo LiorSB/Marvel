@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.PowerShell.SDK" Version="7.1.5" />
     <PackageReference Include="Prism.Wpf" Version="8.1.97" />
+    <PackageReference Include="SSH.NET" Version="2020.0.1" />
     <PackageReference Include="System.Management.Automation" Version="7.1.5" />
   </ItemGroup>
 

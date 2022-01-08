@@ -1,10 +1,11 @@
-﻿<Window x:Class="Marvel.EditHostWindow"
+﻿<Window x:Class="Marvel.View.EditHostWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="EditHostWindow" Height="150" Width="250">
+        Title="EditHostWindow" Height="150" Width="250"
+        WindowStartupLocation="CenterOwner">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -19,16 +20,14 @@
         </Grid.ColumnDefinitions>
 
         <TextBlock Grid.Row="0"  Grid.Column="0"  Text="IP:"/>
-        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding IP, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding IPEdited, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
         <TextBlock Grid.Row="1" Grid.Column="0" Text="Username:"/>
-        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Username, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding UsernameEdited, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
         <TextBlock Grid.Row="2" Grid.Column="0" Text="Password:"/>
-        <PasswordBox Grid.Row="2" Grid.Column="1"/>
-        <!--<PasswordBox Grid.Row="2" Grid.Column="1" PasswordChanged="PasswordBox_PasswordChanged"/>-->
+        <PasswordBox Grid.Row="2" Grid.Column="1" Name="EditPasswordBox" PasswordChanged="PasswordBox_HostPasswordChanged"/>
 
-        <Button Grid.Row="3"  Grid.Column="1" Content="Save"/>
-        <Button Grid.Row="3"  Grid.Column="0" Content="Cancel"/>
+        <Button Grid.Row="3"  Grid.ColumnSpan="2147483647" Content="Save" Command="{Binding SaveEditCommand}"/>
     </Grid>
 </Window>

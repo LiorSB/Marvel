@@ -1,4 +1,4 @@
-﻿<Window x:Class="Marvel.MainWindow"
+﻿<Window x:Class="Marvel.View.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -59,7 +59,7 @@
                 <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding Username, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
                 <TextBlock Grid.Row="2" Grid.Column="0" Text="Password:"/>
-                <PasswordBox Grid.Row="2" Grid.Column="2" PasswordChanged="PasswordBox_PasswordChanged"/>
+                <PasswordBox Grid.Row="2" Grid.Column="2" Name="HostPasswordBox" PasswordChanged="PasswordBox_PasswordChanged"/>
 
                 <Button Grid.Row="3" Grid.ColumnSpan="2147483647" Content="Add Host" Command="{Binding AddHostCommand}"/>
             </Grid>
@@ -139,8 +139,8 @@
             <TabControl Grid.Column="0">
                 <TabItem Header="Hosts">
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
-                        <ItemsControl Name="HostsList" ItemsSource="{Binding HostList}">
-                            <ItemsControl.ItemTemplate>
+                        <ListView Name="HostsList" HorizontalContentAlignment="Stretch" ItemsSource="{Binding HostList}" SelectedItem="{Binding SelectedHost}">
+                            <ListView.ItemTemplate>
                                 <DataTemplate>
                                     <Grid>
                                         <Grid.ColumnDefinitions>
@@ -160,8 +160,8 @@
                                         <CheckBox Grid.Column="3" IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                                     </Grid>
                                 </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
+                            </ListView.ItemTemplate>
+                        </ListView>
                     </ScrollViewer>
                 </TabItem>
 
@@ -175,13 +175,7 @@
             <TabControl Grid.Column="1">
                 <TabItem Header="Marvel Output">
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
-                        <ItemsControl Name="CommandOutput" ItemsSource="{Binding HostList}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <!--<TextBlock Text="{Binding Details, Path=SelectedValuePath}"/>-->
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
+                        <TextBlock Text="{Binding SelectedHost.Details}"/>
                     </ScrollViewer>
                 </TabItem>
 

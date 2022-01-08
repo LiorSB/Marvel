@@ -1,4 +1,4 @@
-﻿namespace Marvel
+﻿namespace Marvel.Model
 {
     public class Host
     {
@@ -13,6 +13,8 @@
             IP = newHost.IP;
             Username = newHost.Username;
             Password = newHost.Password;
+            IsSelected = true;
+            Details = "";
         }
 
         public Host(string IP, string Username, string Password)
@@ -20,11 +22,14 @@
             this.IP = IP;
             this.Username = Username;
             this.Password = Password;
+            IsSelected = true;
+            Details = "";
         }
 
         public Host(string IP)
         {
             this.IP = IP;
+            Details = "";
         }
     }
 }
