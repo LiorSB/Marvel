@@ -18,7 +18,7 @@ namespace Marvel.ProtocolCommands
 
             fromDirectory.Remove(0, 3);
 
-            Process process = new Process
+            Process process = new()
             {
                 StartInfo = new ProcessStartInfo
                 {
@@ -39,7 +39,7 @@ namespace Marvel.ProtocolCommands
                 case CommandsEnum.RunItem:
                     process.StartInfo.Arguments += @"\\" + host.IP + @"\" + disk + @"$\" + fromDirectory + @" /s";
                     break;
-                case CommandsEnum.CopyItem:
+                case CommandsEnum.ReceiveItem:
                     process.StartInfo.Arguments += @"copy \\" + host.IP + @"\" + disk + @"$\" + fromDirectory + @" " + toDirectory;
                     break;
                 default:

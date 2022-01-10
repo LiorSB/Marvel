@@ -4,6 +4,7 @@
     {
         GetDirectoryFilesList,
         RunItem,
-        CopyItem
+        ReceiveItem,
+        SendItem
     }
 }
