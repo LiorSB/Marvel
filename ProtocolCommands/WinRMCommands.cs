@@ -29,8 +29,11 @@ namespace Marvel.ProtocolCommands
                 case CommandsEnum.RunItem:
                     ps.AddScript("Invoke-Command -Session $session -ScriptBlock {" + fromDirectory + " /silent}");
                     break;
-                case CommandsEnum.CopyItem:
+                case CommandsEnum.ReceiveItem:
                     ps.AddScript("Copy-Item -FromSession $session " + fromDirectory + " -Destination " + toDirectory);
+                    break;
+                case CommandsEnum.SendItem:
+                    ps.AddScript("Copy-Item -ToSession $session " + fromDirectory + " -Destination " + toDirectory);
                     break;
                 default:
                     return null;

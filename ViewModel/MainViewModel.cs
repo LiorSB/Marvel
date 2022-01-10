@@ -266,7 +266,6 @@ namespace Marvel.ViewModel
         // With the command arp -a in CMD, we extract with the use of regex dynamic IPs.
         private void ScanForLocalIPs()
         {
-            string cmdOutput = "";
             Process process = new()
             {
                 StartInfo = new ProcessStartInfo
@@ -280,6 +279,8 @@ namespace Marvel.ViewModel
             };
 
             process.Start();
+
+            string cmdOutput = "";
 
             while (!process.StandardOutput.EndOfStream)
             {
@@ -306,7 +307,7 @@ namespace Marvel.ViewModel
             foreach (string ip in ipList)
             {
                 Host newHost = new(ip);
-                _hostList.Add(newHost);
+                HostList.Add(newHost);
             }
         }
 
@@ -317,6 +318,13 @@ namespace Marvel.ViewModel
 
         private void AddHostsFromFile()
         {
+            int index = _fromDirectory.LastIndexOf('.');
+
+            if (index == -1 || _fromDirectory[index..] != ".txt")
+            {
+                return;
+            }
+
             string text = System.IO.File.ReadAllText(_fromDirectory);
 
             Regex ipRegex = new Regex(@"\b(\d{1,3}\.){3}\d{1,3}\b");
@@ -325,7 +333,7 @@ namespace Marvel.ViewModel
             foreach (var ip in resultIP)
             {
                 Host newHost = new(ip.ToString());
-                _hostList.Add(newHost);
+                HostList.Add(newHost);
             }
         }
 
@@ -346,44 +354,69 @@ namespace Marvel.ViewModel
 
         private void RunCommand()
         {
-            switch (_selectedProtocol)
+            for (int i = 0; i < _hostList.Count; i++)
             {
-                case ProtocolsEnum.WinRM:
-                    for (int i = 0; i < _hostList.Count; i++)
+                if (_hostList[i].IsSelected)
+                {
+                    int index = i;
+
+                    switch (_selectedProtocol)
                     {
-                        if (_hostList[i].IsSelected)
-                        {
-                            int index = i;
+                        case ProtocolsEnum.WinRM:
                             Task.Run(() => HostList[index].Details += _winRMCommands.Commands(_hostList[index], _fromDirectory, _toDirectory, _selectedCommand) + "\n");
-                        }
-                    }
-
-                    break;
-                case ProtocolsEnum.SMB:
-                    for (int i = 0; i < _hostList.Count; i++)
-                    {
-                        if (_hostList[i].IsSelected)
-                        {
-                            int index = i;
+                            break;
+                        case ProtocolsEnum.SMB:
                             Task.Run(() => HostList[index].Details += _smbCommands.Commands(_hostList[index], _fromDirectory, _toDirectory, _selectedCommand) + "\n");
-                        }
-                    }
-
-                    break;
-                case ProtocolsEnum.SSH:
-                    for (int i = 0; i < _hostList.Count; i++)
-                    {
-                        if (_hostList[i].IsSelected)
-                        {
-                            int index = i;
+                            break;
+                        case ProtocolsEnum.SSH:
                             Task.Run(() => HostList[index].Details += _sshCommands.Commands(_hostList[index], _fromDirectory, _toDirectory, _selectedCommand) + "\n");
-                        }
+                            break;
+                        default:
+                            break;
                     }
-
-                    break;
-                default:
-                    break;   
+                }
             }
+
+
+
+            //switch (_selectedProtocol)
+            //{
+            //    case ProtocolsEnum.WinRM:
+            //        for (int i = 0; i < _hostList.Count; i++)
+            //        {
+            //            if (_hostList[i].IsSelected)
+            //            {
+            //                int index = i;
+            //                Task.Run(() => HostList[index].Details += _winRMCommands.Commands(_hostList[index], _fromDirectory, _toDirectory, _selectedCommand) + "\n");
+            //            }
+            //        }
+
+            //        break;
+            //    case ProtocolsEnum.SMB:
+            //        for (int i = 0; i < _hostList.Count; i++)
+            //        {
+            //            if (_hostList[i].IsSelected)
+            //            {
+            //                int index = i;
+            //                Task.Run(() => HostList[index].Details += _smbCommands.Commands(_hostList[index], _fromDirectory, _toDirectory, _selectedCommand) + "\n");
+            //            }
+            //        }
+
+            //        break;
+            //    case ProtocolsEnum.SSH:
+            //        for (int i = 0; i < _hostList.Count; i++)
+            //        {
+            //            if (_hostList[i].IsSelected)
+            //            {
+            //                int index = i;
+            //                Task.Run(() => HostList[index].Details += _sshCommands.Commands(_hostList[index], _fromDirectory, _toDirectory, _selectedCommand) + "\n");
+            //            }
+            //        }
+
+            //        break;
+            //    default:
+            //        break;   
+            //}
         }
 
         private bool CanRemoveHost(Host host)

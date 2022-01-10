@@ -9,7 +9,7 @@ namespace Marvel.ProtocolCommands
     {
         public string Commands(Host host, string fromDirectory, string toDirectory, CommandsEnum selectedCommand)
         {
-            if (selectedCommand == CommandsEnum.CopyItem)
+            if (selectedCommand is CommandsEnum.ReceiveItem or CommandsEnum.SendItem)
             {
                 int index = fromDirectory.LastIndexOf('\\');
 
@@ -23,7 +23,14 @@ namespace Marvel.ProtocolCommands
                 ScpClient scpClient = new(host.IP, host.Username, host.Password);
                 scpClient.Connect();
 
-                scpClient.Download(fromDirectory, File.OpenWrite(toDirectory));
+                if (selectedCommand == CommandsEnum.ReceiveItem)
+                {
+                    scpClient.Download(fromDirectory, File.OpenWrite(toDirectory));
+                }
+                else
+                {
+                    scpClient.Upload(File.OpenWrite(fromDirectory), toDirectory);
+                }
 
                 return "Downloaded to " + toDirectory;
             }
