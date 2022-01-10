@@ -4,6 +4,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Management.Automation;
 
+
 namespace Marvel.ProtocolCommands
 {
     class WinRMCommands
@@ -59,5 +60,6 @@ namespace Marvel.ProtocolCommands
 
             return resultString;
         }
+
     }
 }

@@ -1,202 +1,207 @@
 ﻿<Window x:Class="Marvel.View.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="750" Width="650">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="100*"/>
-        </Grid.RowDefinitions>
+		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		mc:Ignorable="d"
+		Title="MainWindow" Height="750" Width="650">
+    <Grid  Margin="10,0,10,10">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="*"/>
+			<RowDefinition Height="100*"/>
+		</Grid.RowDefinitions>
 
-        <Menu Grid.Row="0" Grid.ColumnSpan="2147483647">
-            <MenuItem Header="_Scan">
-                <MenuItem Header="_Save" Command="ApplicationCommands.Save"/>
-            </MenuItem>
-            <MenuItem Header="_Edit">
-                <MenuItem Header="_Edit IP"/>
-                <MenuItem Header="_Delete IP"/>
-            </MenuItem>
-        </Menu>
+		<Menu Grid.Row="0" Grid.ColumnSpan="2147483647">
+			<MenuItem Header="_Scan">
+				<MenuItem Header="_Save" Command="ApplicationCommands.Save"/>
+			</MenuItem>
+			<MenuItem Header="_Edit">
+				<MenuItem Header="_Edit IP"/>
+				<MenuItem Header="_Delete IP"/>
+			</MenuItem>
+		</Menu>
 
-        <TextBlock Grid.Row="1" Text="Add IPs to Scan:" FontSize="18" FontWeight="Bold" TextAlignment="Center"/>
+		<TextBlock Grid.Row="1" Text="Add IPs to Scan:" FontSize="18" FontWeight="Bold" TextAlignment="Center"/>
 
-        <!--Add IPs to List-->
-        <Grid Grid.Row="2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="50*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="50*"/>
-            </Grid.ColumnDefinitions>
-            
-            <!--Manual IP, Username and Password Input-->
-            <Grid Grid.Column="0">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
+		<!--Add IPs to List-->
+		<Grid Grid.Row="2">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="50*"/>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="50*"/>
+			</Grid.ColumnDefinitions>
+			
+			<!--Manual IP, Username and Password Input-->
+			<Grid Grid.Column="0">
+				<Grid.RowDefinitions>
+					<RowDefinition Height="*"/>
+					<RowDefinition Height="*"/>
+					<RowDefinition Height="*"/>
+					<RowDefinition Height="*"/>
+				</Grid.RowDefinitions>
 
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="15*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="50*"/>
-                </Grid.ColumnDefinitions>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="15*"/>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="50*"/>
+				</Grid.ColumnDefinitions>
 
 
-                <TextBlock Grid.Row="0"  Grid.Column="0"  Text="IP:"/>
-                <TextBox Grid.Row="0" Grid.Column="2" Text="{Binding IP, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+				<TextBlock Grid.Row="0"  Grid.Column="0"  Text="IP:"/>
+				<TextBox Grid.Row="0" Grid.Column="2" Text="{Binding IP, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+				<Button Grid.Row="3" Grid.ColumnSpan="2147483647" Content="Add Host" Command="{Binding AddHostCommand}"/>
 
-                <TextBlock Grid.Row="1" Grid.Column="0" Text="Username:"/>
-                <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding Username, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+				<TextBlock Grid.Row="1" Grid.Column="0" Text="Username:"/>
+				<TextBox Grid.Row="1" Grid.Column="2" Text="{Binding Username, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
-                <TextBlock Grid.Row="2" Grid.Column="0" Text="Password:"/>
-                <PasswordBox Grid.Row="2" Grid.Column="2" Name="HostPasswordBox" PasswordChanged="PasswordBox_PasswordChanged"/>
+				<TextBlock Grid.Row="2" Grid.Column="0" Text="Password:"/>
+				<PasswordBox Grid.Row="2" Grid.Column="2" Name="HostPasswordBox" PasswordChanged="PasswordBox_PasswordChanged"/>
 
-                <Button Grid.Row="3" Grid.ColumnSpan="2147483647" Content="Add Host" Command="{Binding AddHostCommand}"/>
-            </Grid>
+				<Button Grid.Row="3" Grid.ColumnSpan="2147483647" Content="Add Host" Command="{Binding AddHostCommand}"/>
+			</Grid>
 
-            <!--Segment, Local IP Scanner and Add Hosts From a File-->
-            <Grid Grid.Column="2">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
+			<!--Segment, Local IP Scanner and Add Hosts From a File-->
+			<Grid Grid.Column="2">
+				<Grid.RowDefinitions>
+					<RowDefinition Height="*"/>
+					<RowDefinition Height="*"/>
+					<RowDefinition Height="*"/>
+				</Grid.RowDefinitions>
 
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="15*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="40*"/>
-                    <ColumnDefinition Width="20*"/>
-                </Grid.ColumnDefinitions>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="15*"/>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="40*"/>
+					<ColumnDefinition Width="20*"/>
+				</Grid.ColumnDefinitions>
 
-                <TextBlock Grid.Row="0" Grid.Column="0" Text="Segment:"/>
-                <TextBox Grid.Row="0" Grid.Column="2" Text="{Binding Segment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                <Button Grid.Row="0" Grid.Column="5" Content="Scan Segment" Command="{Binding AddHostCommand}"/>
+				<TextBlock Grid.Row="0" Grid.Column="0" Text="Segment:"/>
+				<TextBox Grid.Row="0" Grid.Column="2" Text="{Binding Segment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+				<Button Grid.Row="0" Grid.Column="5" Content="Scan Segment" Command="{Binding AddHostCommand}"/>
 
-                <Button Grid.Row="1" Grid.ColumnSpan="2147483647" Content="Scan For Local IPs" Command="{Binding ScanForLocalIPsCommand}"/>
+				<Button Grid.Row="1" Grid.ColumnSpan="2147483647" Content="Scan For Local IPs" Command="{Binding ScanForLocalIPsCommand}"/>
 
-                <Button Grid.Row="2" Grid.ColumnSpan="2147483647" Content="Add Hosts From a File" Command="{Binding AddHostsFromFileCommand}"/>
-            </Grid>
-        </Grid>
+				<Button Grid.Row="2" Grid.ColumnSpan="2147483647" Content="Add Hosts From a File" Command="{Binding AddHostsFromFileCommand}"/>
+			</Grid>
+		</Grid>
 
-        <TextBlock Grid.Row="3" Text="Commands:" FontSize="18" FontWeight="Bold" TextAlignment="Center"/>
+		<TextBlock Grid.Row="3" Text="Commands:" FontSize="18" FontWeight="Bold" TextAlignment="Center"/>
 
-        <!--Set Command and Protocol-->
-        <Grid Grid.Row="4">
-            <Grid.RowDefinitions>
+		<!--Set Command and Protocol-->
+		<Grid Grid.Row="4">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
+				<RowDefinition Height="*"/>
+				<RowDefinition Height="*"/>
+			</Grid.RowDefinitions>
 
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="3*"/>
-            </Grid.ColumnDefinitions>
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="3*"/>
+			</Grid.ColumnDefinitions>
 
-            <TextBlock Grid.Row="0" Grid.Column="0" Text="Protocols:"/>
-            <ComboBox Grid.Row="0" Grid.Column="1" Name="Protocols" ItemsSource="{Binding Protocols}" SelectedItem="{Binding SelectedProtocol}">
-                <!--<ComboBoxItem Content="WinRM" IsSelected="True"/>
-                <ComboBoxItem Content="SMB"/>
-                <ComboBoxItem Content="SSH"/>-->
-            </ComboBox>
-            
-            <TextBlock Grid.Row="1" Grid.Column="0" Text="Commands:"/>
-            <ComboBox Grid.Row="1" Grid.Column="1" Name="Commands" ItemsSource="{Binding Commands}" SelectedItem="{Binding SelectedCommand}">
-                <!--<ComboBoxItem Content="Get Directory Files List" IsSelected="True"/>
-                <ComboBoxItem Content="Run Item"/>
-                <ComboBoxItem Content="Copy Item"/>-->
-            </ComboBox>
+			<TextBlock Grid.Row="0" Grid.Column="0" Text="Protocols:" Margin="0,3,0,0"/>
+            <ComboBox Grid.Row="0" Grid.Column="1" Name="Protocols" Margin="0,3,0,0" ItemsSource="{Binding Protocols}" SelectedItem="{Binding SelectedProtocol}">
+				<!--<ComboBoxItem Content="WinRM" IsSelected="True"/>
+				<ComboBoxItem Content="SMB"/>
+				<ComboBoxItem Content="SSH"/>-->
+			</ComboBox>
 
-            <TextBlock Grid.Row="2" Grid.Column="0" Text="From Directory:"/>
-            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding FromDirectory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-            <TextBlock Grid.Row="3" Grid.Column="0" Text="To Directory:"/>
-            <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding ToDirectory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="Commands:" Margin="0,3,0,0"/>
+            <ComboBox Grid.Row="1" Grid.Column="1" Name="Commands" Margin="0,3,0,0" ItemsSource="{Binding Commands}" SelectedItem="{Binding SelectedCommand}">
+				<!--<ComboBoxItem Content="Get Directory Files List" IsSelected="True"/>
+				<ComboBoxItem Content="Run Item"/>
+				<ComboBoxItem Content="Copy Item"/>-->
+			</ComboBox>
 
-            <Button Grid.Row="4" Grid.Column="0" Content="Cancel" Command="{Binding CancelCommand}"/>
-            <Button Grid.Row="4" Grid.Column="1" Content="Run Command" Command="{Binding RunCommandCommand}"/>
-        </Grid>
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="From Directory:" Margin="0,3,0,0"/>
+            <TextBox Grid.Row="2" Grid.Column="1" Margin="0,3,0,0" Text="{Binding FromDirectory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <TextBlock Grid.Row="3" Grid.Column="0" Margin="0,3,0,0" Text="To Directory:"/>
+            <TextBox Grid.Row="3" Grid.Column="1" Margin="0,3,0,0" Name="txtEditor" Text="{Binding ToDirectory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <WrapPanel Grid.Row="3" Grid.Column="2" Margin="0,3,0,0" HorizontalAlignment="Right" DockPanel.Dock="Top">
+                <Button Name="btnOpenFile" Click="btnOpenFile_Click" Content="Choose file" Width="82"/>
+            </WrapPanel>
 
-        <!--Results Information-->
-        <Grid Grid.Row="6">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="3*"/>
-            </Grid.ColumnDefinitions>
-            
-            <TabControl Grid.Column="0">
-                <TabItem Header="Hosts">
-                    <ScrollViewer VerticalScrollBarVisibility="Auto">
-                        <ListView Name="HostsList" HorizontalContentAlignment="Stretch" ItemsSource="{Binding HostList}" SelectedItem="{Binding SelectedHost}">
-                            <ListView.ItemTemplate>
-                                <DataTemplate>
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="5*"/>
-                                            <ColumnDefinition Width="2*"/>
-                                            <ColumnDefinition Width="*"/>
-                                        </Grid.ColumnDefinitions>
 
-                                        <Button Command="{Binding DataContext.RemoveHostCommand,
-                                        RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TabControl}}"
-                                            CommandParameter="{Binding}">
-                                            <TextBlock Grid.Column="0" Text="X" Foreground="Red"/>
-                                        </Button>
-                                        <TextBlock Grid.Column="1" Text="{Binding IP}"/>
-                                        <Button Grid.Column="2" Content="Edit" Click="Button_EditHost"/>
-                                        <CheckBox Grid.Column="3" IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                                    </Grid>
-                                </DataTemplate>
-                            </ListView.ItemTemplate>
-                        </ListView>
-                    </ScrollViewer>
-                </TabItem>
+            <Button Margin="0,3,0,0" Grid.Row="4" Grid.Column="0" Content="Cancel" Command="{Binding CancelCommand}"/>
+            <Button Margin="0,3,0,0" Grid.Row="4" Grid.Column="1" Content="Run Command" Command="{Binding RunCommandCommand}" Click="Button_Click"/>
+		</Grid>
 
-                <TabItem Header="Services">
-                    <ScrollViewer VerticalScrollBarVisibility="Auto">
-                        <Label Content="Content goes here..." />
-                    </ScrollViewer>
-                </TabItem>
-            </TabControl>
-            
-            <TabControl Grid.Column="1">
-                <TabItem Header="Marvel Output">
-                    <ScrollViewer VerticalScrollBarVisibility="Auto">
-                        <TextBlock Text="{Binding SelectedHost.Details}"/>
-                    </ScrollViewer>
-                </TabItem>
+		<!--Results Information-->
+		<Grid Grid.Row="6">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="3*"/>
+			</Grid.ColumnDefinitions>
+			
+			<TabControl Grid.Column="0">
+				<TabItem Header="Hosts">
+					<ScrollViewer VerticalScrollBarVisibility="Auto">
+						<ListView Name="HostsList" HorizontalContentAlignment="Stretch" ItemsSource="{Binding HostList}" SelectedItem="{Binding SelectedHost}">
+							<ListView.ItemTemplate>
+								<DataTemplate>
+									<Grid>
+										<Grid.ColumnDefinitions>
+											<ColumnDefinition Width="*"/>
+											<ColumnDefinition Width="5*"/>
+											<ColumnDefinition Width="2*"/>
+											<ColumnDefinition Width="*"/>
+										</Grid.ColumnDefinitions>
 
-                <TabItem Header="Hosts/Ports">
-                    <ScrollViewer VerticalScrollBarVisibility="Auto">
-                        <Label Content="Content goes here..." />
-                    </ScrollViewer>
-                </TabItem>
+										<Button Command="{Binding DataContext.RemoveHostCommand,
+										RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TabControl}}"
+											CommandParameter="{Binding}">
+											<TextBlock Grid.Column="0" Text="X" Foreground="Red"/>
+										</Button>
+										<TextBlock Grid.Column="1" Text="{Binding IP}" VerticalAlignment="Center"/>
+										<Button Grid.Column="2" Content="Edit" Click="Button_EditHost"/>
+										<CheckBox Grid.Column="3" Margin="1" VerticalAlignment="Center" IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+									</Grid>
+								</DataTemplate>
+							</ListView.ItemTemplate>
+						</ListView>
+					</ScrollViewer>
+				</TabItem>
 
-                <TabItem Header="Host Details">
-                    <ScrollViewer VerticalScrollBarVisibility="Auto">
-                        <Label Content="Content goes here..." />
-                    </ScrollViewer>
-                </TabItem>
+				<TabItem Header="Services">
+					<ScrollViewer VerticalScrollBarVisibility="Auto">
+						<Label Content="Content goes here..." />
+					</ScrollViewer>
+				</TabItem>
+			</TabControl>
+			
+			<TabControl Grid.Column="1">
+				<TabItem Header="Marvel Output">
+					<ScrollViewer VerticalScrollBarVisibility="Auto">
+						<TextBlock Text="{Binding SelectedHost.Details}"/>
+					</ScrollViewer>
+				</TabItem>
 
-                <TabItem Header="Command Details">
-                    <ScrollViewer VerticalScrollBarVisibility="Auto">
-                        <!--<TextBlock Text="{Binding ScanDetails, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>-->
-                    </ScrollViewer>
-                </TabItem>
-            </TabControl>
-        </Grid>
-    </Grid>
+				<TabItem Header="Hosts/Ports">
+					<ScrollViewer VerticalScrollBarVisibility="Auto">
+						<Label Content="Content goes here..." />
+					</ScrollViewer>
+				</TabItem>
+
+				<TabItem Header="Host Details">
+					<ScrollViewer VerticalScrollBarVisibility="Auto">
+						<Label Content="Content goes here..." />
+					</ScrollViewer>
+				</TabItem>
+
+				<TabItem Header="Command Details">
+					<ScrollViewer VerticalScrollBarVisibility="Auto">
+						<!--<TextBlock Text="{Binding ScanDetails, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>-->
+					</ScrollViewer>
+				</TabItem>
+			</TabControl>
+		</Grid>
+	</Grid>
 </Window>

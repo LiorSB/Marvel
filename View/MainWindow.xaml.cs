@@ -2,6 +2,7 @@
 using Marvel.ViewModel;
 using System.Windows;
 using System.Windows.Controls;
+using Microsoft.Win32;
 
 namespace Marvel.View
 {
@@ -42,6 +43,14 @@ namespace Marvel.View
             editHostWindow.DataContext = new EditHostViewModel((Host)((Button)sender).DataContext);
             editHostWindow.Owner = this;
             editHostWindow.ShowDialog();
+        }
+
+        private void btnOpenFile_Click(object sender, RoutedEventArgs e) 
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*";
+            if (openFileDialog.ShowDialog() == true)
+                txtEditor.Text = openFileDialog.FileName;
         }
     }
 }
