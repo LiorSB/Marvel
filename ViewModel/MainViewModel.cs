@@ -376,47 +376,6 @@ namespace Marvel.ViewModel
                     }
                 }
             }
-
-
-
-            //switch (_selectedProtocol)
-            //{
-            //    case ProtocolsEnum.WinRM:
-            //        for (int i = 0; i < _hostList.Count; i++)
-            //        {
-            //            if (_hostList[i].IsSelected)
-            //            {
-            //                int index = i;
-            //                Task.Run(() => HostList[index].Details += _winRMCommands.Commands(_hostList[index], _fromDirectory, _toDirectory, _selectedCommand) + "\n");
-            //            }
-            //        }
-
-            //        break;
-            //    case ProtocolsEnum.SMB:
-            //        for (int i = 0; i < _hostList.Count; i++)
-            //        {
-            //            if (_hostList[i].IsSelected)
-            //            {
-            //                int index = i;
-            //                Task.Run(() => HostList[index].Details += _smbCommands.Commands(_hostList[index], _fromDirectory, _toDirectory, _selectedCommand) + "\n");
-            //            }
-            //        }
-
-            //        break;
-            //    case ProtocolsEnum.SSH:
-            //        for (int i = 0; i < _hostList.Count; i++)
-            //        {
-            //            if (_hostList[i].IsSelected)
-            //            {
-            //                int index = i;
-            //                Task.Run(() => HostList[index].Details += _sshCommands.Commands(_hostList[index], _fromDirectory, _toDirectory, _selectedCommand) + "\n");
-            //            }
-            //        }
-
-            //        break;
-            //    default:
-            //        break;   
-            //}
         }
 
         private bool CanRemoveHost(Host host)

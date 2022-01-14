@@ -34,13 +34,15 @@ namespace Marvel.ProtocolCommands
             {
                 case CommandsEnum.GetDirectoryFilesList:
                     process.StartInfo.Arguments += @"dir \\" + host.IP + @"\" + disk + @"$\" + fromDirectory;
-
                     break;
                 case CommandsEnum.RunItem:
                     process.StartInfo.Arguments += @"\\" + host.IP + @"\" + disk + @"$\" + fromDirectory + @" /s";
                     break;
                 case CommandsEnum.ReceiveItem:
                     process.StartInfo.Arguments += @"copy \\" + host.IP + @"\" + disk + @"$\" + fromDirectory + @" " + toDirectory;
+                    break;
+                case CommandsEnum.SendItem: // Should fix so to and from will be placed opposite
+                    process.StartInfo.Arguments += @"copy " + toDirectory + @" \\" + host.IP + @"\" + disk + @"$\" + fromDirectory;
                     break;
                 default:
                     break;
