@@ -128,10 +128,8 @@
             <WrapPanel Grid.Row="3" Grid.Column="2" Margin="0,3,0,0" HorizontalAlignment="Right" DockPanel.Dock="Top">
                 <Button Name="btnOpenFile" Click="btnOpenFile_Click" Content="Choose file" Width="82"/>
             </WrapPanel>
-
-
             <Button Margin="0,3,0,0" Grid.Row="4" Grid.Column="0" Content="Cancel" Command="{Binding CancelCommand}"/>
-            <Button Margin="0,3,0,0" Grid.Row="4" Grid.Column="1" Content="Run Command" Command="{Binding RunCommandCommand}" Click="Button_Click"/>
+            <Button Margin="0,3,0,0" Grid.Row="4" Grid.Column="1" Content="Run Command" Command="{Binding RunCommandCommand}"/>
 		</Grid>
 
 		<!--Results Information-->

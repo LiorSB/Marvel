@@ -28,6 +28,6 @@
         <TextBlock Grid.Row="2" Grid.Column="0" Text="Password:" VerticalAlignment="Center"/>
         <PasswordBox Grid.Row="2" Grid.Column="1" Name="EditPasswordBox" PasswordChanged="PasswordBox_HostPasswordChanged" Margin="2,6,2,6"/>
 
-        <Button Grid.Row="3" Margin="0,10,0,0" Grid.ColumnSpan="2147483647" Content="Save" Click="UpdateHostDetails" Command="{Binding SaveEditCommand}"/>
+        <Button Grid.Row="3" Margin="0,10,0,0" Grid.ColumnSpan="2147483647" Content="Save" Command="{Binding SaveEditCommand}"/>
     </Grid>
 </Window>
