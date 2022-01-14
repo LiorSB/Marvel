@@ -1,4 +1,7 @@
-﻿using Prism.Commands;
+﻿using Marvel.Enum;
+using Marvel.Model;
+using Marvel.ProtocolCommands;
+using Prism.Commands;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -7,10 +10,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
-using Marvel.Enum;
-using Marvel.ProtocolCommands;
 using System.Threading.Tasks;
-using Marvel.Model;
 
 namespace Marvel.ViewModel
 {
@@ -255,7 +255,7 @@ namespace Marvel.ViewModel
 
         private void ScanSegment()
         {
-            
+
         }
 
         private bool CanScanForLocalIPs()
