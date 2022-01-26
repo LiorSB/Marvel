@@ -1,7 +1,7 @@
 # Marvel
 **Project Background-**
 
-Marvel is a desktop application that can scan for several ports through a local network and make a connection with a chosen protocol. You can enter IPs into the program manually, with an auto IP scanner, a file that holds IPs or a segment to scan. The program will check the IP's connectivity and display in different tabs those that managed to make a connection and those that failed. After making a connection, Marvel will scan every computer for artifacts and later process and parse them, which will later be uploaded to the main machince/cloud.
+Marvel is a desktop application that can scan and parse artifacts to extract executables from remote computers through comminication protocols. The  user can add hosts manually, from a file or automatically scan for local hosts and get information about their connectivity, OS and ports. The user can execute commands, transfer files and get information about directories from remote computers with the help of the communication protocols WinRM, SSH, SMB and WMI. Once a connection is made, The user can set Marvel to scan and parse every remote computer for artifacts accroding to "Windows Artifacts Analysis Program Execution" to get paths for executable files, which will be extracted to the main machince computer.
 
 **Project's Target-**
 
