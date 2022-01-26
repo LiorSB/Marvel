@@ -17,6 +17,4 @@ The project can be used by anyone, but it is dedicated especially for IR teams.
 
 In the application you can enter host by inputting their details manually, use the segment scanner, local IP scanner or input a file of hosts. You can later edit, select or delete existing hosts. In the combo box you can choose a protocol to work with and a command to execute, below that there are two text boxes to input the target and destination directories. Once a command is executed the command details can be seen in the output tab.
 
-**Project Outputs-**
-
-Connectivity of each scanned port and chosen type of files.
+![image](https://user-images.githubusercontent.com/92099051/151139290-7b38d062-aa8f-4533-8eb8-954fddcdf5aa.png)
