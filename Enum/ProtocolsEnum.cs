@@ -4,6 +4,7 @@
     {
         WinRM,
         SMB,
-        SSH
+        SSH,
+        RPC
     }
 }

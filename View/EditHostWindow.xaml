@@ -20,7 +20,7 @@
         </Grid.ColumnDefinitions>
 
         <TextBlock Grid.Row="0"  Grid.Column="0"  Text="IP:"/>
-        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding IPEdited, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding IPEdited, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
         <TextBlock Grid.Row="1" Grid.Column="0" Text="Username:"/>
         <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding UsernameEdited, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>

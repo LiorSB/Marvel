@@ -5,6 +5,11 @@
         GetDirectoryFilesList,
         RunItem,
         ReceiveItem,
-        SendItem
+        SendItem,
+        GetFolder,
+        ExtractExecutables,
+        GetSystemInformation,
+        PingIP,
+        PortConnectivity
     }
 }
