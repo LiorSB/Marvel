@@ -8,9 +8,12 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using Marvel.Enum;
-using Marvel.ProtocolCommands;
+using Marvel.Commands;
 using System.Threading.Tasks;
 using Marvel.Model;
+using GalaSoft.MvvmLight.Command;
+using System.Windows.Input;
+using Marvel.Utilities;
 
 namespace Marvel.ViewModel
 {
@@ -26,6 +29,8 @@ namespace Marvel.ViewModel
         private string _fromDirectory = "";
         private string _toDirectory = "";
 
+        private Dictionary<ProtocolsEnum, List<CommandsEnum>> _commandsByProtocol;
+
         private IEnumerable<ProtocolsEnum> _protocols = null;
         private ProtocolsEnum _selectedProtocol;
 
@@ -34,12 +39,28 @@ namespace Marvel.ViewModel
 
         private ObservableCollection<Host> _hostList = new();
 
-        private WinRMCommands _winRMCommands = new();
+        /*private WinRMCommands _winRMCommands = new();
         private SMBCommands _smbCommands = new();
         private SSHCommands _sshCommands = new();
+        private NetworkCommands _networkCommands = new();*/
 
         private Host _selectedHost;
 
+        public List<CommandsEnum> DirectoryEnabled => new()
+        {
+            CommandsEnum.ReceiveItem,
+            CommandsEnum.SendItem,
+            CommandsEnum.GetFolder,
+            CommandsEnum.ExtractExecutables
+        };
+
+        public Dictionary<ProtocolsEnum, List<CommandsEnum>> CommandsByProtocol 
+        { 
+            get
+            {
+                return _commandsByProtocol;
+            }
+        }
 
         public IEnumerable<ProtocolsEnum> Protocols
         {
@@ -69,6 +90,8 @@ namespace Marvel.ViewModel
             {
                 _selectedProtocol = value;
                 NotifyPropertyChanged();
+
+
             }
         }
 
@@ -93,7 +116,7 @@ namespace Marvel.ViewModel
         public CommandsEnum SelectedCommand
         {
             get
-            {
+            {                
                 return _selectedCommand;
             }
             set
@@ -125,6 +148,50 @@ namespace Marvel.ViewModel
             CancelCommand = new DelegateCommand(Cancel, CanCancel);
             RunCommandCommand = new DelegateCommand(RunCommand, CanRunCommand);
             RemoveHostCommand = new DelegateCommand<Host>(RemoveHost, CanRemoveHost);
+
+            InitializeCommandsByProtocol();
+        }
+
+        private void InitializeCommandsByProtocol()
+        {
+            _commandsByProtocol = new();
+
+            _commandsByProtocol.Add(ProtocolsEnum.WinRM, new List<CommandsEnum>
+            {
+                CommandsEnum.GetDirectoryFilesList,
+                CommandsEnum.ReceiveItem,
+                CommandsEnum.RunItem,
+                CommandsEnum.SendItem,
+                CommandsEnum.ExtractExecutables
+            });
+
+            _commandsByProtocol.Add(ProtocolsEnum.SMB, new List<CommandsEnum>
+            {
+                CommandsEnum.GetDirectoryFilesList,
+                CommandsEnum.ReceiveItem,
+                CommandsEnum.RunItem,
+                CommandsEnum.SendItem,
+                CommandsEnum.ExtractExecutables
+            });
+
+            _commandsByProtocol.Add(ProtocolsEnum.SSH, new List<CommandsEnum>
+            {
+                CommandsEnum.GetDirectoryFilesList,
+                CommandsEnum.ReceiveItem,
+                CommandsEnum.RunItem,
+                CommandsEnum.SendItem,
+                CommandsEnum.GetFolder,
+                CommandsEnum.ExtractExecutables
+            });
+
+            _commandsByProtocol.Add(ProtocolsEnum.RPC, new List<CommandsEnum>
+            {
+                CommandsEnum.GetSystemInformation,
+                CommandsEnum.PingIP,
+                CommandsEnum.PortConnectivity
+            });
+
+            NotifyPropertyChanged("CommandsByProtocol");
         }
 
         public string IP
@@ -356,11 +423,14 @@ namespace Marvel.ViewModel
         {
             for (int i = 0; i < _hostList.Count; i++)
             {
-                if (_hostList[i].IsSelected)
+                if (_hostList[i].IsChecked)
                 {
                     int index = i;
 
-                    switch (_selectedProtocol)
+
+                    CommandUtilities.Instance.RunCommand(_selectedProtocol, HostList[index], _fromDirectory, _toDirectory, _selectedCommand);
+
+                    /*switch (_selectedProtocol)
                     {
                         case ProtocolsEnum.WinRM:
                             Task.Run(() => HostList[index].Details += _winRMCommands.Commands(_hostList[index], _fromDirectory, _toDirectory, _selectedCommand) + "\n");
@@ -373,7 +443,7 @@ namespace Marvel.ViewModel
                             break;
                         default:
                             break;
-                    }
+                    }*/
                 }
             }
         }

@@ -3,8 +3,13 @@
 		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:converters="clr-namespace:Marvel.Converters"
 		mc:Ignorable="d"
 		Title="MainWindow" Height="750" Width="650">
+	<Window.Resources>
+		<converters:DictionaryConverter x:Key="dictionaryConverter"/>
+		<converters:ListContainsToBooleanConverter x:Key="listContainsToBooleanConverter"/>
+	</Window.Resources>
 	<Grid>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="Auto"/>
@@ -50,7 +55,6 @@
 					<ColumnDefinition Width="*"/>
 					<ColumnDefinition Width="50*"/>
 				</Grid.ColumnDefinitions>
-
 
 				<TextBlock Grid.Row="0"  Grid.Column="0"  Text="IP:"/>
 				<TextBox Grid.Row="0" Grid.Column="2" Text="{Binding IP, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
@@ -107,23 +111,29 @@
 			</Grid.ColumnDefinitions>
 
 			<TextBlock Grid.Row="0" Grid.Column="0" Text="Protocols:"/>
-			<ComboBox Grid.Row="0" Grid.Column="1" Name="Protocols" ItemsSource="{Binding Protocols}" SelectedItem="{Binding SelectedProtocol}">
-				<!--<ComboBoxItem Content="WinRM" IsSelected="True"/>
-				<ComboBoxItem Content="SMB"/>
-				<ComboBoxItem Content="SSH"/>-->
-			</ComboBox>
-			
+			<ComboBox Grid.Row="0" Grid.Column="1" Name="Protocols" ItemsSource="{Binding Protocols}" SelectedItem="{Binding SelectedProtocol}"/>
+
 			<TextBlock Grid.Row="1" Grid.Column="0" Text="Commands:"/>
-			<ComboBox Grid.Row="1" Grid.Column="1" Name="Commands" ItemsSource="{Binding Commands}" SelectedItem="{Binding SelectedCommand}">
-				<!--<ComboBoxItem Content="Get Directory Files List" IsSelected="True"/>
-				<ComboBoxItem Content="Run Item"/>
-				<ComboBoxItem Content="Copy Item"/>-->
+			<ComboBox Grid.Row="1" Grid.Column="1" Name="Commands" SelectedItem="{Binding SelectedCommand}" IsSynchronizedWithCurrentItem="True" SelectedIndex="0">
+				<ComboBox.ItemsSource>
+					<MultiBinding Converter="{StaticResource dictionaryConverter}">
+						<Binding Path="CommandsByProtocol"/>
+						<Binding Path="SelectedProtocol"/>
+					</MultiBinding>
+				</ComboBox.ItemsSource>
 			</ComboBox>
 
 			<TextBlock Grid.Row="2" Grid.Column="0" Text="From Directory:"/>
 			<TextBox Grid.Row="2" Grid.Column="1" Text="{Binding FromDirectory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 			<TextBlock Grid.Row="3" Grid.Column="0" Text="To Directory:"/>
-			<TextBox Grid.Row="3" Grid.Column="1" Text="{Binding ToDirectory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+			<TextBox Grid.Row="3" Grid.Column="1" Text="{Binding ToDirectory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+				<TextBox.IsEnabled>
+					<MultiBinding Converter="{StaticResource listContainsToBooleanConverter}">
+						<Binding Path="DirectoryEnabled"/>
+						<Binding Path="SelectedCommand"/>
+					</MultiBinding>
+				</TextBox.IsEnabled>
+			</TextBox> 
 
 			<Button Grid.Row="4" Grid.Column="0" Content="Cancel" Command="{Binding CancelCommand}"/>
 			<Button Grid.Row="4" Grid.Column="1" Content="Run Command" Command="{Binding RunCommandCommand}"/>
@@ -157,7 +167,7 @@
 										</Button>
 										<TextBlock Grid.Column="1" Text="{Binding IP}"/>
 										<Button Grid.Column="2" Content="Edit" Click="Button_EditHost"/>
-										<CheckBox Grid.Column="3" IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+										<CheckBox Grid.Column="3" IsChecked="{Binding IsChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 									</Grid>
 								</DataTemplate>
 							</ListView.ItemTemplate>
@@ -181,13 +191,13 @@
 
 				<TabItem Header="Hosts/Ports">
 					<ScrollViewer VerticalScrollBarVisibility="Auto">
-						<Label Content="Content goes here..." />
+						<TextBlock Text="{Binding SelectedHost.PortsConnectivity}"/>
 					</ScrollViewer>
 				</TabItem>
 
 				<TabItem Header="Host Details">
 					<ScrollViewer VerticalScrollBarVisibility="Auto">
-						<Label Content="Content goes here..." />
+						<TextBlock Text="{Binding SelectedHost.SystemInformation}"/>
 					</ScrollViewer>
 				</TabItem>
 
