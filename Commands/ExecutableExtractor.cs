@@ -2,36 +2,51 @@
 using Marvel.Model;
 using Marvel.Utilities;
 using Prefetch;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 
 namespace Marvel.Commands
 {
-    class ExecutableExtractor
+    public class ExecutableExtractor
     {
-        public string ExtractFiles(Host host, string fromDirectory, string toDirectory, ProtocolsEnum selectedProtocol)
+        private const string EXE_FORMAT_LOWER_CASE = ".exe";
+        private const string EXE_FORMAT_UPPER_CASE = ".EXE";
+        private const string PF_FORMAT = "*.pf";
+        private const string PREFETCH_FOLDER = @"\Prefetch";
+        private const string PREFETCH_DIRECTORY = @"C:\Windows\Prefetch";
+
+        public string ExtractFiles(Host host, string toDirectory, ProtocolsEnum selectedProtocol)
         {
             string folderName = host.IP.Replace('.', '_');
             string path = toDirectory + '\\' + folderName;
 
             DirectoryInfo hostDirectoryInfo = Directory.CreateDirectory(path);
 
-            PrefetchExtractor(host, fromDirectory, path, selectedProtocol);
+            PrefetchExtractor(host, path, selectedProtocol);
 
             return $"Executable files downloaded to: {path}";
         }
 
-        public string PrefetchExtractor(Host host, string fromDirectory, string toDirectory, ProtocolsEnum selectedProtocol)
+        public string PrefetchExtractor(Host host, string toDirectory, ProtocolsEnum selectedProtocol)
         {
-            string path = toDirectory + @"\Prefetch";
-            DirectoryInfo pathInfo = Directory.CreateDirectory(path);
+            if (selectedProtocol != ProtocolsEnum.WinRM)
+            {
+                toDirectory += PREFETCH_FOLDER;
+                /*DirectoryInfo pathInfo = */Directory.CreateDirectory(toDirectory);
+            }
 
-            Task continuation = CommandUtilities.Instance.RunCommand(selectedProtocol, host, fromDirectory, path, CommandsEnum.GetFolder);
+            Task continuation = CommandUtilities.Instance.RunCommand(selectedProtocol, host, PREFETCH_DIRECTORY, toDirectory, CommandsEnum.GetFolder);
             continuation.Wait();
+
+            if (selectedProtocol == ProtocolsEnum.WinRM)
+            {
+                toDirectory += PREFETCH_FOLDER;
+            }
 
             IPrefetch pf;
 
-            foreach (var file in Directory.GetFiles(path, "*.pf"))
+            foreach (string file in Directory.GetFiles(toDirectory, PF_FORMAT))
             {
                 try
                 {
@@ -41,7 +56,7 @@ namespace Marvel.Commands
 
                     foreach (var fileName in pf.Filenames)
                     {
-                        if (!fileName.Contains(".exe") && !fileName.Contains(".EXE"))
+                        if (!fileName.Contains(EXE_FORMAT_LOWER_CASE) && !fileName.Contains(EXE_FORMAT_UPPER_CASE))
                         {
                             continue;
                         }
@@ -54,12 +69,12 @@ namespace Marvel.Commands
                             executablePath = @"C:" + executablePath[indexToSplit..];
                             break;
                         }
-                    } 
+                    }
 
-                    CommandUtilities.Instance.RunCommand(selectedProtocol, host, executablePath, path, CommandsEnum.ReceiveItem);
+                    CommandUtilities.Instance.RunCommand(selectedProtocol, host, executablePath, toDirectory, CommandsEnum.ReceiveItem);
                     //PrefetchFile.SavePrefetch(path, pf);
                 }
-                catch
+                catch (Exception e)
                 {
                     continue;
                 }
@@ -90,7 +105,7 @@ namespace Marvel.Commands
                 //pf.Header.Signature.Should().Be("SCCA");
             }
 
-            return $"Prefetch executables downloaded to: {path}";
+            return $"Prefetch executables downloaded to: {toDirectory}";
         }
     }
 }

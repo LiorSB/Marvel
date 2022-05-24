@@ -89,7 +89,7 @@
 
 				<Button Grid.Row="1" Grid.ColumnSpan="2147483647" Content="Scan For Local IPs" Command="{Binding ScanForLocalIPsCommand}"/>
 
-				<Button Grid.Row="2" Grid.ColumnSpan="2147483647" Content="Add Hosts From a File" Command="{Binding AddHostsFromFileCommand}"/>
+				<Button Grid.Row="2" Grid.ColumnSpan="2147483647" Content="Add Hosts From a File" Click="Button_AddHostsFromFile" Command="{Binding AddHostsFromFileCommand}"/>
 			</Grid>
 		</Grid>
 
@@ -124,12 +124,19 @@
 			</ComboBox>
 
 			<TextBlock Grid.Row="2" Grid.Column="0" Text="From Directory:"/>
-			<TextBox Grid.Row="2" Grid.Column="1" Text="{Binding FromDirectory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+			<TextBox Grid.Row="2" Grid.Column="1" Text="{Binding FromDirectory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+				<TextBox.IsEnabled>
+					<MultiBinding Converter="{StaticResource listContainsToBooleanConverter}">
+						<Binding Path="FromDirectoryEnabled"/>
+						<Binding Path="SelectedCommand"/>
+					</MultiBinding>
+				</TextBox.IsEnabled>
+			</TextBox>
 			<TextBlock Grid.Row="3" Grid.Column="0" Text="To Directory:"/>
 			<TextBox Grid.Row="3" Grid.Column="1" Text="{Binding ToDirectory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
 				<TextBox.IsEnabled>
 					<MultiBinding Converter="{StaticResource listContainsToBooleanConverter}">
-						<Binding Path="DirectoryEnabled"/>
+						<Binding Path="ToDirectoryEnabled"/>
 						<Binding Path="SelectedCommand"/>
 					</MultiBinding>
 				</TextBox.IsEnabled>

@@ -2,9 +2,9 @@
 {
     public enum ProtocolsEnum
     {
+        SSH, 
         WinRM,
         SMB,
-        SSH,
         RPC
     }
 }
