@@ -1,5 +1,7 @@
 ﻿using Marvel.Model;
 using Marvel.ViewModel;
+using Microsoft.Win32;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -42,6 +44,16 @@ namespace Marvel.View
             editHostWindow.DataContext = new EditHostViewModel((Host)((Button)sender).DataContext);
             editHostWindow.Owner = this;
             editHostWindow.ShowDialog();
+        }
+
+        private void Button_AddHostsFromFile(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openFileDialog = new();
+
+            if (openFileDialog.ShowDialog() == true)
+            {
+                _viewModel.HostsFileDirectory = openFileDialog.FileName;
+            }
         }
     }
 }

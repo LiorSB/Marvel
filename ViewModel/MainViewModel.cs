@@ -8,11 +8,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using Marvel.Enum;
-using Marvel.Commands;
-using System.Threading.Tasks;
 using Marvel.Model;
-using GalaSoft.MvvmLight.Command;
-using System.Windows.Input;
 using Marvel.Utilities;
 
 namespace Marvel.ViewModel
@@ -28,25 +24,26 @@ namespace Marvel.ViewModel
         private string _segment = "";
         private string _fromDirectory = "";
         private string _toDirectory = "";
+        private string _hostsFileDirectory = "";
 
         private Dictionary<ProtocolsEnum, List<CommandsEnum>> _commandsByProtocol;
-
         private IEnumerable<ProtocolsEnum> _protocols = null;
         private ProtocolsEnum _selectedProtocol;
-
         private IEnumerable<CommandsEnum> _commands = null;
         private CommandsEnum _selectedCommand;
-
         private ObservableCollection<Host> _hostList = new();
-
-        /*private WinRMCommands _winRMCommands = new();
-        private SMBCommands _smbCommands = new();
-        private SSHCommands _sshCommands = new();
-        private NetworkCommands _networkCommands = new();*/
-
         private Host _selectedHost;
 
-        public List<CommandsEnum> DirectoryEnabled => new()
+        public List<CommandsEnum> FromDirectoryEnabled => new()
+        {
+            CommandsEnum.GetDirectoryFilesList,
+            CommandsEnum.RunItem,
+            CommandsEnum.ReceiveItem,
+            CommandsEnum.SendItem,
+            CommandsEnum.GetFolder
+        };
+
+        public List<CommandsEnum> ToDirectoryEnabled => new()
         {
             CommandsEnum.ReceiveItem,
             CommandsEnum.SendItem,
@@ -156,29 +153,31 @@ namespace Marvel.ViewModel
         {
             _commandsByProtocol = new();
 
+            _commandsByProtocol.Add(ProtocolsEnum.SSH, new List<CommandsEnum>
+            {
+                CommandsEnum.GetDirectoryFilesList,
+                CommandsEnum.RunItem,
+                CommandsEnum.ReceiveItem,
+                CommandsEnum.SendItem,
+                CommandsEnum.GetFolder,
+                CommandsEnum.ExtractExecutables
+            });
+
             _commandsByProtocol.Add(ProtocolsEnum.WinRM, new List<CommandsEnum>
             {
                 CommandsEnum.GetDirectoryFilesList,
-                CommandsEnum.ReceiveItem,
                 CommandsEnum.RunItem,
+                CommandsEnum.ReceiveItem,
                 CommandsEnum.SendItem,
+                CommandsEnum.GetFolder,
                 CommandsEnum.ExtractExecutables
             });
 
             _commandsByProtocol.Add(ProtocolsEnum.SMB, new List<CommandsEnum>
             {
                 CommandsEnum.GetDirectoryFilesList,
-                CommandsEnum.ReceiveItem,
                 CommandsEnum.RunItem,
-                CommandsEnum.SendItem,
-                CommandsEnum.ExtractExecutables
-            });
-
-            _commandsByProtocol.Add(ProtocolsEnum.SSH, new List<CommandsEnum>
-            {
-                CommandsEnum.GetDirectoryFilesList,
                 CommandsEnum.ReceiveItem,
-                CommandsEnum.RunItem,
                 CommandsEnum.SendItem,
                 CommandsEnum.GetFolder,
                 CommandsEnum.ExtractExecutables
@@ -272,6 +271,19 @@ namespace Marvel.ViewModel
             }
         }
 
+        public string HostsFileDirectory
+        {
+            get
+            {
+                return _hostsFileDirectory;
+            }
+            set
+            {
+                _hostsFileDirectory = value;
+                NotifyPropertyChanged();
+            }
+        }
+
         public ObservableCollection<Host> HostList
         {
             get
@@ -292,7 +304,6 @@ namespace Marvel.ViewModel
         public DelegateCommand CancelCommand { get; private set; }
         public DelegateCommand RunCommandCommand { get; private set; }
         public DelegateCommand<Host> RemoveHostCommand { get; private set; }
-        //public DelegateCommand ScanCommand { get; private set; }
 
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
@@ -370,7 +381,6 @@ namespace Marvel.ViewModel
                 }
             }
 
-
             foreach (string ip in ipList)
             {
                 Host newHost = new(ip);
@@ -385,21 +395,29 @@ namespace Marvel.ViewModel
 
         private void AddHostsFromFile()
         {
-            int index = _fromDirectory.LastIndexOf('.');
+            int index = _hostsFileDirectory.LastIndexOf('.');
 
-            if (index == -1 || _fromDirectory[index..] != ".txt")
+            if (index == -1 || _hostsFileDirectory[index..] != ".txt")
             {
                 return;
             }
 
-            string text = System.IO.File.ReadAllText(_fromDirectory);
+            string text = System.IO.File.ReadAllText(_hostsFileDirectory);
 
-            Regex ipRegex = new Regex(@"\b(\d{1,3}\.){3}\d{1,3}\b");
+            /*Regex ipRegex = new Regex(@"\b(\d{1,3}\.){3}\d{1,3}\b");
             MatchCollection resultIP = ipRegex.Matches(text);
 
             foreach (var ip in resultIP)
             {
                 Host newHost = new(ip.ToString());
+                HostList.Add(newHost);
+            }*/
+
+            string[] splittedText = text.Split();
+
+            for (int i = 0; i < splittedText.Length; i += 3)
+            {
+                Host newHost = new(splittedText[i], splittedText[i + 1], splittedText[i + 2]);
                 HostList.Add(newHost);
             }
         }
@@ -427,23 +445,7 @@ namespace Marvel.ViewModel
                 {
                     int index = i;
 
-
                     CommandUtilities.Instance.RunCommand(_selectedProtocol, HostList[index], _fromDirectory, _toDirectory, _selectedCommand);
-
-                    /*switch (_selectedProtocol)
-                    {
-                        case ProtocolsEnum.WinRM:
-                            Task.Run(() => HostList[index].Details += _winRMCommands.Commands(_hostList[index], _fromDirectory, _toDirectory, _selectedCommand) + "\n");
-                            break;
-                        case ProtocolsEnum.SMB:
-                            Task.Run(() => HostList[index].Details += _smbCommands.Commands(_hostList[index], _fromDirectory, _toDirectory, _selectedCommand) + "\n");
-                            break;
-                        case ProtocolsEnum.SSH:
-                            Task.Run(() => HostList[index].Details += _sshCommands.Commands(_hostList[index], _fromDirectory, _toDirectory, _selectedCommand) + "\n");
-                            break;
-                        default:
-                            break;
-                    }*/
                 }
             }
         }
@@ -457,22 +459,5 @@ namespace Marvel.ViewModel
         {
             _hostList.Remove(host);
         }
-        //private bool CanScan()
-        //{
-        //    return true;
-        //}
-
-        //private void Scan()
-        //{
-        //    try
-        //    {
-        //        TcpClient client = new(_ip, 135);
-        //        _scanDetails = string.Format("Succesfuly pinged host:'" + _ip + ":" + 135 + "'");
-        //    }
-        //    catch (SocketException)
-        //    {
-        //        _scanDetails = string.Format("Error pinging host:'" + _ip + ":" + /*portNumber.ToString() +*/ "'");
-        //    }
-        //}
     }
 }
