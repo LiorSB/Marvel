@@ -15,6 +15,7 @@ namespace Marvel.Commands
         private const string PF_FORMAT = "*.pf";
         private const string PREFETCH_FOLDER = @"\Prefetch";
         private const string PREFETCH_DIRECTORY = @"C:\Windows\Prefetch";
+        private const string C_DIRECTORY = "C:";
 
         public string ExtractFiles(Host host, string toDirectory, ProtocolsEnum selectedProtocol)
         {
@@ -66,7 +67,7 @@ namespace Marvel.Commands
                             executablePath += fileName;
 
                             int indexToSplit = executablePath.IndexOf('}') + 1;
-                            executablePath = @"C:" + executablePath[indexToSplit..];
+                            executablePath = C_DIRECTORY + executablePath[indexToSplit..];
                             break;
                         }
                     }
