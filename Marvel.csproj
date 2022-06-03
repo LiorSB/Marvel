@@ -12,7 +12,7 @@
     <PackageReference Include="MvvmLightLibs" Version="5.4.1.1" />
     <PackageReference Include="Prefetch" Version="1.1.1" />
     <PackageReference Include="Prism.Wpf" Version="8.1.97" />
-    <PackageReference Include="SSH.NET" Version="2020.0.1" />
+    <PackageReference Include="SSH.NET" Version="2020.0.2" />
     <PackageReference Include="System.Management.Automation" Version="7.1.5" />
     <PackageReference Include="System.Net.Ping" Version="4.3.0" />
   </ItemGroup>
