@@ -11,11 +11,8 @@ namespace Marvel.Commands
         {
             PowerShell ps = PowerShell.Create();
 
-            // Set credentials
             ps.AddScript($"$password = ConvertTo-SecureString '{host.Password}' -AsPlainText -Force");
             ps.AddScript($"$cred = New-Object System.Management.Automation.PSCredential (\"{host.Username}\", $password)");
-
-            // Start Session
             ps.AddScript($"$session = New-PSSession -ComputerName {host.IP} -Credential $cred");
 
             return ps;
@@ -31,7 +28,7 @@ namespace Marvel.Commands
             }
             catch (Exception e)
             {
-                return e.Message;
+                return null;
             }
 
             string resultString = "";
@@ -44,8 +41,27 @@ namespace Marvel.Commands
             return resultString;
         }
 
+        public string GetUserProfileDirectory(Host host, string directory)
+        {
+            if (directory[0] != '%')
+            {
+                return directory;
+            }
+
+            PowerShell ps = InitializePowerShell(host);
+            ps.AddScript("Invoke-Command -Session $session -ScriptBlock { [Environment]::GetEnvironmentVariable('UserProfile') }");
+            string output = RunPowerShell(ps);
+
+            directory = directory.Replace("%USERPROFILE%", "");
+            directory = output?.Trim() + directory;
+
+            return directory;
+        }
+
         public string GetDirectory(Host host, string fromDirectory)
         {
+            fromDirectory = GetUserProfileDirectory(host, fromDirectory);
+
             PowerShell ps = InitializePowerShell(host);
             ps.AddScript($"Invoke-Command -Session $session -ScriptBlock {{ Get-ChildItem \"{fromDirectory}\" }}");
 
@@ -54,6 +70,8 @@ namespace Marvel.Commands
 
         public string RunItem(Host host, string fromDirectory)
         {
+            fromDirectory = GetUserProfileDirectory(host, fromDirectory);
+
             PowerShell ps = InitializePowerShell(host);
             ps.AddScript($"Invoke-Command -Session $session -ScriptBlock {{ \"{fromDirectory}\" /silent}}");
 
@@ -62,6 +80,8 @@ namespace Marvel.Commands
 
         public string ReceiveItem(Host host, string fromDirectory, string toDirectory)
         {
+            fromDirectory = GetUserProfileDirectory(host, fromDirectory);
+
             PowerShell ps = InitializePowerShell(host);
             ps.AddScript($"Copy-Item -FromSession $session \"{fromDirectory}\" -Destination \"{toDirectory}\"");
 
@@ -70,6 +90,8 @@ namespace Marvel.Commands
 
         public string SendItem(Host host, string fromDirectory, string toDirectory)
         {
+            fromDirectory = GetUserProfileDirectory(host, fromDirectory);
+
             PowerShell ps = InitializePowerShell(host);
             ps.AddScript($"Copy-Item -ToSession $session \"{fromDirectory}\" -Destination \"{toDirectory}\"");
 
@@ -78,6 +100,8 @@ namespace Marvel.Commands
 
         public string GetFolder(Host host, string fromDirectory, string toDirectory)
         {
+            fromDirectory = GetUserProfileDirectory(host, fromDirectory);
+
             PowerShell ps = InitializePowerShell(host);
             ps.AddScript($"Copy-Item -Recurse -FromSession $session \"{fromDirectory}\" -Destination \"{toDirectory}\"");
 
