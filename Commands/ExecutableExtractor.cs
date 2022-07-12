@@ -44,7 +44,7 @@ namespace Marvel.Commands
             DirectoryInfo hostDirectoryInfo = Directory.CreateDirectory(path);
 
             PrefetchExtractor(host, path, selectedProtocol);
-            AmcacheExtractor(host, path, selectedProtocol);
+            //AmcacheExtractor(host, path, selectedProtocol); Currently bugged since can't open hive files.
             JumpListExtractor(host, path, selectedProtocol);
 
             return $"Executable files downloaded to: {path}";
