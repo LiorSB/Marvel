@@ -183,7 +183,7 @@
 				</TabItem>
 
 				<TabItem Header="Services">
-					<ScrollViewer VerticalScrollBarVisibility="Auto">
+					<ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
 						<Label Content="Content goes here..." />
 					</ScrollViewer>
 				</TabItem>
@@ -191,25 +191,25 @@
 			
 			<TabControl Grid.Column="1">
 				<TabItem Header="Marvel Output">
-					<ScrollViewer VerticalScrollBarVisibility="Auto">
+					<ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
 						<TextBlock Text="{Binding SelectedHost.Details}"/>
 					</ScrollViewer>
 				</TabItem>
 
 				<TabItem Header="Hosts/Ports">
-					<ScrollViewer VerticalScrollBarVisibility="Auto">
+					<ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
 						<TextBlock Text="{Binding SelectedHost.PortsConnectivity}"/>
 					</ScrollViewer>
 				</TabItem>
 
 				<TabItem Header="Host Details">
-					<ScrollViewer VerticalScrollBarVisibility="Auto">
+					<ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
 						<TextBlock Text="{Binding SelectedHost.SystemInformation}"/>
 					</ScrollViewer>
 				</TabItem>
 
 				<TabItem Header="Command Details">
-					<ScrollViewer VerticalScrollBarVisibility="Auto">
+					<ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
 						<!--<TextBlock Text="{Binding ScanDetails, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>-->
 					</ScrollViewer>
 				</TabItem>

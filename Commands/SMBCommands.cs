@@ -1,11 +1,26 @@
 ﻿using Marvel.Model;
 using System;
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 
 namespace Marvel.Commands
 {
     class SMBCommands : IProtocolCommands
     {
+        public char CutDiskFromDirectory(ref string directory)
+        {
+            if (directory.Length < 3)
+            {
+                return '\0';
+            }
+
+            char disk = directory[0];
+
+            directory = directory.Remove(0, 3);
+
+            return disk;
+        }
+
         public Process InitializeProcess(Host host)
         {
             Process process = new()
@@ -46,16 +61,48 @@ namespace Marvel.Commands
             return cmdOutPut;
         }
 
+        public string GetUserProfileDirectory(Host host, string directory)
+        {
+            if (directory[0] != '%')
+            {
+                return directory;
+            }
+
+            Process process = InitializeProcess(host);
+            process.StartInfo.Arguments += $"echo %USERPROFILE%";
+
+            string output = RunProcess(process);
+
+            string pattern = @"C:\\Users\\.*";
+
+            try
+            {
+                foreach (Match match in Regex.Matches(output, pattern, RegexOptions.IgnoreCase))
+                {
+                    output = match.Value;
+                }
+            }
+            catch (RegexMatchTimeoutException) 
+            { 
+
+            }
+
+            directory = directory.Replace("%USERPROFILE%", "");
+
+            directory = output + directory;
+
+            return directory;
+        }
+
         public string GetDirectory(Host host, string fromDirectory)
         {
-            if (fromDirectory.Length < 3)
+            fromDirectory = GetUserProfileDirectory(host, fromDirectory);
+            char disk = CutDiskFromDirectory(ref fromDirectory);
+
+            if (disk == '\0')
             {
                 return null;
             }
-
-            char disk = fromDirectory[0];
-
-            fromDirectory = fromDirectory.Remove(0, 3);
 
             Process process = InitializeProcess(host);
             process.StartInfo.Arguments += @$"dir ""\\{host.IP}\{disk}$\{fromDirectory}""";
@@ -65,14 +112,13 @@ namespace Marvel.Commands
 
         public string RunItem(Host host, string fromDirectory)
         {
-            if (fromDirectory.Length < 3)
+            fromDirectory = GetUserProfileDirectory(host, fromDirectory);
+            char disk = CutDiskFromDirectory(ref fromDirectory);
+
+            if (disk == '\0')
             {
                 return null;
             }
-
-            char disk = fromDirectory[0];
-
-            fromDirectory = fromDirectory.Remove(0, 3);
 
             Process process = InitializeProcess(host);
             process.StartInfo.Arguments += @$"""\\{host.IP}\{disk}$\{fromDirectory}"" /s";
@@ -82,14 +128,13 @@ namespace Marvel.Commands
 
         public string ReceiveItem(Host host, string fromDirectory, string toDirectory)
         {
-            if (fromDirectory.Length < 3)
+            fromDirectory = GetUserProfileDirectory(host, fromDirectory);
+            char disk = CutDiskFromDirectory(ref fromDirectory);
+
+            if (disk == '\0')
             {
                 return null;
             }
-
-            char disk = fromDirectory[0];
-
-            fromDirectory = fromDirectory.Remove(0, 3);
 
             Process process = InitializeProcess(host);
             process.StartInfo.Arguments += @$"copy ""\\{host.IP}\{disk}$\{fromDirectory}"" ""{toDirectory}""";
@@ -99,14 +144,13 @@ namespace Marvel.Commands
 
         public string SendItem(Host host, string fromDirectory, string toDirectory)
         {
-            if (fromDirectory.Length < 3)
+            fromDirectory = GetUserProfileDirectory(host, fromDirectory);
+            char disk = CutDiskFromDirectory(ref fromDirectory);
+
+            if (disk == '\0')
             {
                 return null;
             }
-
-            char disk = fromDirectory[0];
-
-            fromDirectory = fromDirectory.Remove(0, 3);
 
             Process process = InitializeProcess(host);
             // Should fix so to and from will be placed opposite
@@ -117,14 +161,13 @@ namespace Marvel.Commands
 
         public string GetFolder(Host host, string fromDirectory, string toDirectory)
         {
-            if (fromDirectory.Length < 3)
+            fromDirectory = GetUserProfileDirectory(host, fromDirectory);
+            char disk = CutDiskFromDirectory(ref fromDirectory);
+
+            if (disk == '\0')
             {
                 return null;
             }
-
-            char disk = fromDirectory[0];
-
-            fromDirectory = fromDirectory.Remove(0, 3);
 
             Process process = InitializeProcess(host);
             // Can also use xcopy instead of robocopy.
