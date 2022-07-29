@@ -45,6 +45,11 @@ In the application you can enter host by inputting their details manually, use t
 ![image](https://user-images.githubusercontent.com/92099051/151139290-7b38d062-aa8f-4533-8eb8-954fddcdf5aa.png)
 
 ## Commands Inputs
+### Requirements for a Command
+- A valid host (IP, Username and Password) must be checked from the Hosts panel.
+- Chosen protocol from combobox has it's port open and listening.
+- Choose a command, fill the directory fields and press the Run Command button.
+
 ### GetDirectoryFileList - Get Information about a Directory
 - From Directory - Insert the remote directory path to get. Example: C:\Foo
 
