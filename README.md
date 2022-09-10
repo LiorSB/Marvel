@@ -28,7 +28,7 @@ Test-WsMan COMPUTER # Replace “COMPUTER” with the name or IP address of the 
 **Enable SSH on Remote PC -**
 [How to Install SSH Server on Windows 10 - Remote into your computer using a Command Line [OpenSSH]](https://www.youtube.com/watch?v=HCmEB5qtkSY)
 
-- Server Installation - Enter "Optional features" in the Windows Search Bar and add the feature "OpenSSH Server" as shown below:<br>
+- Server Installation - Enter "Optional features" in the Windows Search Bar and add the feature "OpenSSH Server" by pressing "Add an optional feature" as shown below:<br>
 ![image](https://4sysops.com/wp-content/uploads/2019/02/Installing-the-OpenSSH-server-via-the-Settings-app-600x402.png)
 <br>
 After the installation is done, restart your computer.
