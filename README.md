@@ -70,3 +70,8 @@ In the application you can enter host by inputting their details manually, use t
 
 ### ExtractExecutables - Extract Executable Files from a Remote Computer to the Local Computer
 - To Directory - Insert the local directory path to extract the files to. Example: C:\Foo
+
+## Troubleshoot
+![.NET not installed Error](https://user-images.githubusercontent.com/92099051/190871668-60f888e1-315c-4787-90b4-763d50c4efd5.jpeg)
+
+Incase .NET isn't installed on the computer, please refer to the following link: [.NET 5.0 Desktop Runtime (v5.0.17) - Windows x64 Installer!](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-5.0.17-windows-x64-installer)
