@@ -49,6 +49,11 @@ namespace Marvel.Commands
                 return e.Message;
             }
 
+            if (string.IsNullOrEmpty(cmdOutPut))
+            {
+                cmdOutPut += "ERROR: The RPC server is unavailable.";
+            }
+
             return cmdOutPut;
         }
 
