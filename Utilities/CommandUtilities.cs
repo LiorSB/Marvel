@@ -59,15 +59,15 @@ namespace Marvel.Utilities
         {
             return selectedCommand switch
             {
-                CommandsEnum.GetDirectoryFilesList => Task.Run(() => host.Details += _protocolCommands[selectedProtocol].GetDirectory(host, fromDirectory) + _newLine),
-                CommandsEnum.RunItem => Task.Run(() => host.Details += _protocolCommands[selectedProtocol].RunItem(host, fromDirectory) + _newLine),
-                CommandsEnum.ReceiveItem => Task.Run(() => host.Details += _protocolCommands[selectedProtocol].ReceiveItem(host, fromDirectory, toDirectory) + _newLine),
-                CommandsEnum.SendItem => Task.Run(() => host.Details += _protocolCommands[selectedProtocol].SendItem(host, fromDirectory, toDirectory) + _newLine),
-                CommandsEnum.GetFolder => Task.Run(() => host.Details += _protocolCommands[selectedProtocol].GetFolder(host, fromDirectory, toDirectory) + _newLine),
-                CommandsEnum.GetSystemInformation => Task.Run(() => host.Details += _protocolCommands[selectedProtocol].GetSystemInformation(host.IP) + _newLine),
-                CommandsEnum.PingIP => Task.Run(() => host.PortsConnectivity += _protocolCommands[selectedProtocol].PingIP(host.IP) + _newLine),
-                CommandsEnum.PortConnectivity => Task.Run(() => host.PortsConnectivity += _protocolCommands[selectedProtocol].PortConnectivity(host.IP) + _newLine),
-                CommandsEnum.ExtractExecutables => Task.Run(() => host.SystemInformation += _executableExtractor.ExtractFiles(host, toDirectory, selectedProtocol) + _newLine),
+                CommandsEnum.GetDirectoryFilesList => Task.Run(() => host.Details += _protocolCommands[selectedProtocol].GetDirectory(host, fromDirectory) + NEW_LINE),
+                CommandsEnum.RunItem => Task.Run(() => host.Details += _protocolCommands[selectedProtocol].RunItem(host, fromDirectory) + NEW_LINE),
+                CommandsEnum.ReceiveItem => Task.Run(() => host.Details += _protocolCommands[selectedProtocol].ReceiveItem(host, fromDirectory, toDirectory) + NEW_LINE),
+                CommandsEnum.SendItem => Task.Run(() => host.Details += _protocolCommands[selectedProtocol].SendItem(host, fromDirectory, toDirectory) + NEW_LINE),
+                CommandsEnum.GetFolder => Task.Run(() => host.Details += _protocolCommands[selectedProtocol].GetFolder(host, fromDirectory, toDirectory) + NEW_LINE),
+                CommandsEnum.GetSystemInformation => Task.Run(() => host.Details += _protocolCommands[selectedProtocol].GetSystemInformation(host.IP) + NEW_LINE),
+                CommandsEnum.PingIP => Task.Run(() => host.PortsConnectivity += _protocolCommands[selectedProtocol].PingIP(host.IP) + NEW_LINE),
+                CommandsEnum.PortConnectivity => Task.Run(() => host.PortsConnectivity += _protocolCommands[selectedProtocol].PortConnectivity(host.IP) + NEW_LINE),
+                CommandsEnum.ExtractExecutables => Task.Run(() => host.SystemInformation += _executableExtractor.ExtractFiles(host, toDirectory, selectedProtocol) + NEW_LINE),
                 _ => null,
             };
         }
