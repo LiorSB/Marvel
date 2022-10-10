@@ -28,7 +28,7 @@ namespace Marvel.Commands
             }
             catch (Exception e)
             {
-                return null;
+                return e.Message;
             }
 
             string resultString = "";

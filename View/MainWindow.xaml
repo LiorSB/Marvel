@@ -5,7 +5,7 @@
 		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:converters="clr-namespace:Marvel.Converters"
 		mc:Ignorable="d"
-		Title="MainWindow" Height="750" Width="650">
+		Title="MainWindow" Height="750" Width="700">
 	<Window.Resources>
 		<converters:DictionaryConverter x:Key="dictionaryConverter"/>
 		<converters:ListContainsToBooleanConverter x:Key="listContainsToBooleanConverter"/>
@@ -83,9 +83,9 @@
 					<ColumnDefinition Width="20*"/>
 				</Grid.ColumnDefinitions>
 
-				<TextBlock Grid.Row="0" Grid.Column="0" Text="Segment:"/>
+				<!--<TextBlock Grid.Row="0" Grid.Column="0" Text="Segment:"/>
 				<TextBox Grid.Row="0" Grid.Column="2" Text="{Binding Segment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-				<Button Grid.Row="0" Grid.Column="5" Content="Scan Segment" Command="{Binding AddHostCommand}"/>
+				<Button Grid.Row="0" Grid.Column="5" Content="Scan Segment" Command="{Binding AddHostCommand}"/>-->
 
 				<Button Grid.Row="1" Grid.ColumnSpan="2147483647" Content="Scan For Local IPs" Command="{Binding ScanForLocalIPsCommand}"/>
 
@@ -149,8 +149,8 @@
 		<!--Results Information-->
 		<Grid Grid.Row="6">
 			<Grid.ColumnDefinitions>
-				<ColumnDefinition Width="*"/>
-				<ColumnDefinition Width="3*"/>
+				<ColumnDefinition Width="2*"/>
+				<ColumnDefinition Width="5*"/>
 			</Grid.ColumnDefinitions>
 			
 			<TabControl Grid.Column="0">
@@ -173,7 +173,7 @@
 											<TextBlock Grid.Column="0" Text="X" Foreground="Red"/>
 										</Button>
 										<TextBlock Grid.Column="1" Text="{Binding IP}"/>
-										<Button Grid.Column="2" Content="Edit" Click="Button_EditHost"/>
+										<Button Grid.Column="2" Content="Edit Auth" Click="Button_EditHost"/>
 										<CheckBox Grid.Column="3" IsChecked="{Binding IsChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 									</Grid>
 								</DataTemplate>
@@ -182,11 +182,11 @@
 					</ScrollViewer>
 				</TabItem>
 
-				<TabItem Header="Services">
+				<!--<TabItem Header="Services">
 					<ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
 						<Label Content="Content goes here..." />
 					</ScrollViewer>
-				</TabItem>
+				</TabItem>-->
 			</TabControl>
 			
 			<TabControl Grid.Column="1">
@@ -196,23 +196,23 @@
 					</ScrollViewer>
 				</TabItem>
 
-				<TabItem Header="Hosts/Ports">
+				<TabItem Header="IP/Port Connectivity">
 					<ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
 						<TextBlock Text="{Binding SelectedHost.PortsConnectivity}"/>
 					</ScrollViewer>
 				</TabItem>
 
-				<TabItem Header="Host Details">
+				<TabItem Header="System Information">
 					<ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
 						<TextBlock Text="{Binding SelectedHost.SystemInformation}"/>
 					</ScrollViewer>
 				</TabItem>
 
-				<TabItem Header="Command Details">
+				<!--<TabItem Header="Command Details">
 					<ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-						<!--<TextBlock Text="{Binding ScanDetails, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>-->
+						<TextBlock Text="{Binding ScanDetails, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 					</ScrollViewer>
-				</TabItem>
+				</TabItem>-->
 			</TabControl>
 		</Grid>
 	</Grid>

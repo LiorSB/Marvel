@@ -1,4 +1,5 @@
 ﻿using Marvel.Model;
+using System;
 using System.Diagnostics;
 using System.Net.Sockets;
 
@@ -32,14 +33,21 @@ namespace Marvel.Commands
                 }
             };
 
-            process.Start();
-
-            while (!process.StandardOutput.EndOfStream)
+            try
             {
-                cmdOutPut += process.StandardOutput.ReadLine() + "\n";
-            }
+                process.Start();
 
-            process.WaitForExit();
+                while (!process.StandardOutput.EndOfStream)
+                {
+                    cmdOutPut += process.StandardOutput.ReadLine() + "\n";
+                }
+
+                process.WaitForExit();
+            }
+            catch (Exception e)
+            {
+                return e.Message;
+            }
 
             return cmdOutPut;
         }
@@ -60,14 +68,21 @@ namespace Marvel.Commands
                 }
             };
 
-            process.Start();
-
-            while (!process.StandardOutput.EndOfStream)
+            try
             {
-                cmdOutPut += process.StandardOutput.ReadLine() + "\n";
-            }
+                process.Start();
 
-            process.WaitForExit();
+                while (!process.StandardOutput.EndOfStream)
+                {
+                    cmdOutPut += process.StandardOutput.ReadLine() + "\n";
+                }
+
+                process.WaitForExit();
+            }
+            catch (Exception e)
+            {
+                return e.Message;
+            }
 
             return cmdOutPut;
         }

@@ -26,6 +26,9 @@ namespace Marvel.ViewModel
         private string _toDirectory = "";
         private string _hostsFileDirectory = "";
 
+        private Regex _ipRegex = new(@"\b(\d{1,3}\.){3}\d{1,3}\b");
+        private Regex _typeRegex = new(@"Type|static|dynamic");
+
         private Dictionary<ProtocolsEnum, List<CommandsEnum>> _commandsByProtocol;
         private IEnumerable<ProtocolsEnum> _protocols = null;
         private ProtocolsEnum _selectedProtocol;
@@ -87,8 +90,6 @@ namespace Marvel.ViewModel
             {
                 _selectedProtocol = value;
                 NotifyPropertyChanged();
-
-
             }
         }
 
@@ -317,12 +318,23 @@ namespace Marvel.ViewModel
 
         private void AddHost()
         {
+            if (string.IsNullOrEmpty(_ip))
+            {
+                return;
+            }
+            
+            if (!_ipRegex.IsMatch(_ip))
+            {
+                return;
+            }
+            
             Host newHost = new(_ip, _username, _password);
             HostList.Add(newHost);
 
             IP = string.Empty;
             Username = string.Empty;
             Password = string.Empty;
+
             OnHostAdded?.Invoke(this, new EventArgs());
         }
 
@@ -367,10 +379,8 @@ namespace Marvel.ViewModel
 
             process.WaitForExit();
 
-            Regex ipRegex = new Regex(@"\b(\d{1,3}\.){3}\d{1,3}\b");
-            Regex typeRegex = new Regex(@"Type|static|dynamic");
-            MatchCollection resultIP = ipRegex.Matches(cmdOutput);
-            MatchCollection resultType = typeRegex.Matches(cmdOutput);
+            MatchCollection resultIP = _ipRegex.Matches(cmdOutput);
+            MatchCollection resultType = _typeRegex.Matches(cmdOutput);
             List<string> ipList = new();
 
             for (int i = 0; i < resultType.Count; i++)
@@ -439,6 +449,23 @@ namespace Marvel.ViewModel
 
         private void RunCommand()
         {
+            if ((_selectedCommand == CommandsEnum.GetDirectoryFilesList || _selectedCommand == CommandsEnum.RunItem) 
+                && string.IsNullOrEmpty(_fromDirectory))
+            {
+                return;
+            }
+
+            if ((_selectedCommand == CommandsEnum.ReceiveItem || _selectedCommand == CommandsEnum.SendItem || _selectedCommand == CommandsEnum.GetFolder)
+                && (string.IsNullOrEmpty(_fromDirectory) || string.IsNullOrEmpty(_toDirectory)))
+            {
+                return;
+            }
+
+            if (_selectedCommand == CommandsEnum.ExtractExecutables && string.IsNullOrEmpty(_toDirectory))
+            {
+                return;
+            }
+
             for (int i = 0; i < _hostList.Count; i++)
             {
                 if (_hostList[i].IsChecked)
