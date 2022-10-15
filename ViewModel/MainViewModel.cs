@@ -428,6 +428,7 @@ namespace Marvel.ViewModel
             }
 
             string text = System.IO.File.ReadAllText(_hostsFileDirectory);
+            text = Regex.Replace(text, @"\s+", "");
 
             /*Regex ipRegex = new Regex(@"\b(\d{1,3}\.){3}\d{1,3}\b");
             MatchCollection resultIP = ipRegex.Matches(text);
@@ -438,7 +439,7 @@ namespace Marvel.ViewModel
                 HostList.Add(newHost);
             }*/
 
-            string[] splittedText = text.Split();
+            string[] splittedText = text.Split(",");
 
             for (int i = 0; i < splittedText.Length; i += 3)
             {

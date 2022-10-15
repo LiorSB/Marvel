@@ -145,7 +145,15 @@ namespace Marvel.Commands
 
             foreach (var column in PREFETCH_TABLE_COLUMNS.Select((value, i) => new { i, value }))
             {
-                excelWorksheet.Cells[1, column.i] = column.value;
+                try
+                {
+                    excelWorksheet.Cells[1, column.i + 1] = column.value;
+                }
+                catch (Exception e)
+                {
+
+                }
+                
             }
 
             int row = 2;
@@ -304,7 +312,7 @@ namespace Marvel.Commands
 
             foreach (var column in AUTOMATIC_DESTINATION_TABLE_COLUMNS.Select((value, i) => new { i, value }))
             {
-                excelWorksheet.Cells[1, column.i] = column.value;
+                excelWorksheet.Cells[1, column.i + 1] = column.value;
             }
 
             int row = 2;
