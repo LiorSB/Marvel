@@ -22,6 +22,7 @@ namespace Marvel.View
         {
             _editHostViewModel = (EditHostViewModel)DataContext;
             EditPasswordBox.Password = _editHostViewModel.Host.Password;
+            _editHostViewModel.RequestClose += (o, e) => { this.Close(); };
         }
 
         private void PasswordBox_HostPasswordChanged(object sender, RoutedEventArgs e)

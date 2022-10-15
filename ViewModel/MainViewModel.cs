@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using Marvel.Enum;
 using Marvel.Model;
 using Marvel.Utilities;
+using System.Threading.Tasks;
 
 namespace Marvel.ViewModel
 {
@@ -36,6 +37,7 @@ namespace Marvel.ViewModel
         private CommandsEnum _selectedCommand;
         private ObservableCollection<Host> _hostList = new();
         private Host _selectedHost;
+        private bool _isRunningCommand = false;
 
         public List<CommandsEnum> FromDirectoryEnabled => new()
         {
@@ -133,6 +135,19 @@ namespace Marvel.ViewModel
             set
             {
                 _selectedHost = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public bool IsRunningCommand
+        {
+            get
+            {
+                return _isRunningCommand;
+            }
+            set
+            {
+                _isRunningCommand = value;
                 NotifyPropertyChanged();
             }
         }
@@ -472,7 +487,10 @@ namespace Marvel.ViewModel
                 {
                     int index = i;
 
-                    CommandUtilities.Instance.RunCommand(_selectedProtocol, HostList[index], _fromDirectory, _toDirectory, _selectedCommand);
+                    IsRunningCommand = true;
+                    Task runCommandTask = CommandUtilities.Instance.RunCommand(_selectedProtocol, HostList[index], _fromDirectory, _toDirectory, _selectedCommand);
+
+                    runCommandTask.ContinueWith((t) => IsRunningCommand = false);
                 }
             }
         }

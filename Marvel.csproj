@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <PackageReference Include="Amcache" Version="1.0.0.6" />
+    <PackageReference Include="FontAwesome.WPF" Version="4.7.0.9" />
     <PackageReference Include="JumpList" Version="1.2.2.2" />
     <PackageReference Include="Microsoft.PowerShell.SDK" Version="7.1.5" />
     <PackageReference Include="MvvmLightLibs" Version="5.4.1.1" />

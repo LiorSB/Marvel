@@ -36,6 +36,79 @@ namespace Marvel.Commands
 
         private const string C_DIRECTORY = "C:";
 
+        private static readonly string[] PREFETCH_TABLE_COLUMNS = { 
+            "SourceFile",
+            "SourceCreated",
+            "SourceModified",
+            "SourceAccessed",
+            "ExecutableName", 
+            "Hash", 
+            "Size", 
+            "Version", 
+            "RunCount",
+            "LastRun",
+            "PreviousRun0", 
+            "PreviousRun1", 
+            "PreviousRun2", 
+            "PreviousRun3", 
+            "PreviousRun4", 
+            "PreviousRun5", 
+            "PreviousRun6", 
+            "Volume0Name",
+            "Volume0Serial",
+            "Volume0Created", 
+            "Volume1Name", 
+            "Volume1Serial",
+            "Volume1Created", 
+            "Directories",
+            "FilesLoaded",
+            "ParsingError"
+        };
+        private static readonly string[] AUTOMATIC_DESTINATION_TABLE_COLUMNS = {
+            "SourceFile",
+            "SourceCreated",
+            "SourceModified",
+            "SourceAccessed",
+            "AppId",
+            "AppIdDescription",
+            "DestListVersion",
+            "LastUsedEntryNumber",
+            "MRU",
+            "EntryNumber",
+            "CreationTime",
+            "LastModified",
+            "Hostname",
+            "MacAddress",
+            "Path",
+            "InteractionCount",
+            "PinStatus",
+            "FileBirthDroid",
+            "FileDroid",
+            "VolumeBirthDroid",
+            "VolumeDroid",
+            "TargetCreated",
+            "TargetModified",
+            "TargetAccessed",
+            "FileSize",
+            "RelativePath",
+            "WorkingDirectory",
+            "FileAttributes",
+            "HeaderFlags",
+            "DriveType",
+            "VolumeSerialNumber",
+            "VolumeLabel",
+            "LocalPath",
+            "CommonPath",
+            "TargetIDAbsolutePath",
+            "TargetMFTEntryNumber",
+            "TargetMFTSequenceNumber",
+            "MachineID",
+            "MachineMACAddress",
+            "TrackerCreatedOn",
+            "ExtraBlocksPresent",
+            "Arguments" 
+        };
+
         public string ExtractFiles(Host host, string toDirectory, ProtocolsEnum selectedProtocol)
         {
             string folderName = host.IP.Replace('.', '_');
@@ -70,32 +143,10 @@ namespace Marvel.Commands
             Excel.Workbook excelWorkbook = excelApp.Workbooks.Add();
             Excel.Worksheet excelWorksheet = (Excel.Worksheet)excelWorkbook.Sheets.Add();
 
-            excelWorksheet.Cells[1, 1] = "SourceFile";
-            excelWorksheet.Cells[1, 2] = "SourceCreated";
-            excelWorksheet.Cells[1, 3] = "SourceModified";
-            excelWorksheet.Cells[1, 4] = "SourceAccessed";
-            excelWorksheet.Cells[1, 5] = "ExecutableName";
-            excelWorksheet.Cells[1, 6] = "Hash";
-            excelWorksheet.Cells[1, 7] = "Size";
-            excelWorksheet.Cells[1, 8] = "Version";
-            excelWorksheet.Cells[1, 9] = "RunCount";
-            excelWorksheet.Cells[1, 10] = "LastRun";
-            excelWorksheet.Cells[1, 11] = "PreviousRun0";
-            excelWorksheet.Cells[1, 12] = "PreviousRun1";
-            excelWorksheet.Cells[1, 13] = "PreviousRun2";
-            excelWorksheet.Cells[1, 14] = "PreviousRun3";
-            excelWorksheet.Cells[1, 15] = "PreviousRun4";
-            excelWorksheet.Cells[1, 16] = "PreviousRun5";
-            excelWorksheet.Cells[1, 17] = "PreviousRun6";
-            excelWorksheet.Cells[1, 18] = "Volume0Name";
-            excelWorksheet.Cells[1, 19] = "Volume0Serial";
-            excelWorksheet.Cells[1, 20] = "Volume0Created";
-            excelWorksheet.Cells[1, 21] = "Volume1Name";
-            excelWorksheet.Cells[1, 22] = "Volume1Serial";
-            excelWorksheet.Cells[1, 23] = "Volume1Created";
-            excelWorksheet.Cells[1, 24] = "Directories";
-            excelWorksheet.Cells[1, 25] = "FilesLoaded";
-            excelWorksheet.Cells[1, 26] = "ParsingError";
+            foreach (var column in PREFETCH_TABLE_COLUMNS.Select((value, i) => new { i, value }))
+            {
+                excelWorksheet.Cells[1, column.i] = column.value;
+            }
 
             int row = 2;
 
@@ -174,16 +225,6 @@ namespace Marvel.Commands
 
                     row += 1;
 
-                    /*foreach (string fileName in pf.Filenames)
-                    {
-                        if (!fileName.Contains(EXE_FORMAT_LOWER_CASE) && !fileName.Contains(EXE_FORMAT_UPPER_CASE))
-                        {
-                            continue;
-                        }
-
-                        
-                    }*/
-
                     CommandUtilities.Instance.RunCommand(selectedProtocol, host, executablePath, toDirectory, CommandsEnum.ReceiveItem);
                 }
                 catch (Exception e)
@@ -261,48 +302,10 @@ namespace Marvel.Commands
             Excel.Workbook excelWorkbook = excelApp.Workbooks.Add();
             Excel.Worksheet excelWorksheet = (Excel.Worksheet)excelWorkbook.Sheets.Add();
 
-            excelWorksheet.Cells[1, 1] = "SourceFile";
-            excelWorksheet.Cells[1, 2] = "SourceCreated";
-            excelWorksheet.Cells[1, 3] = "SourceModified";
-            excelWorksheet.Cells[1, 4] = "SourceAccessed";
-            excelWorksheet.Cells[1, 5] = "AppId";
-            excelWorksheet.Cells[1, 6] = "AppIdDescription";
-            excelWorksheet.Cells[1, 7] = "DestListVersion";
-            excelWorksheet.Cells[1, 8] = "LastUsedEntryNumber";
-            excelWorksheet.Cells[1, 9] = "MRU";
-            excelWorksheet.Cells[1, 10] = "EntryNumber";
-            excelWorksheet.Cells[1, 11] = "CreationTime";
-            excelWorksheet.Cells[1, 12] = "LastModified";
-            excelWorksheet.Cells[1, 13] = "Hostname";
-            excelWorksheet.Cells[1, 14] = "MacAddress";
-            excelWorksheet.Cells[1, 15] = "Path";
-            excelWorksheet.Cells[1, 16] = "InteractionCount";
-            excelWorksheet.Cells[1, 17] = "PinStatus";
-            excelWorksheet.Cells[1, 18] = "FileBirthDroid";
-            excelWorksheet.Cells[1, 19] = "FileDroid";
-            excelWorksheet.Cells[1, 20] = "VolumeBirthDroid";
-            excelWorksheet.Cells[1, 21] = "VolumeDroid";
-            excelWorksheet.Cells[1, 22] = "TargetCreated";
-            excelWorksheet.Cells[1, 23] = "TargetModified";
-            excelWorksheet.Cells[1, 24] = "TargetAccessed";
-            excelWorksheet.Cells[1, 25] = "FileSize";
-            excelWorksheet.Cells[1, 26] = "RelativePath";
-            excelWorksheet.Cells[1, 27] = "WorkingDirectory";
-            excelWorksheet.Cells[1, 28] = "FileAttributes";
-            excelWorksheet.Cells[1, 29] = "HeaderFlags";
-            excelWorksheet.Cells[1, 30] = "DriveType";
-            excelWorksheet.Cells[1, 31] = "VolumeSerialNumber";
-            excelWorksheet.Cells[1, 32] = "VolumeLabel";
-            excelWorksheet.Cells[1, 33] = "LocalPath";
-            excelWorksheet.Cells[1, 34] = "CommonPath";
-            excelWorksheet.Cells[1, 35] = "TargetIDAbsolutePath";
-            excelWorksheet.Cells[1, 36] = "TargetMFTEntryNumber";
-            excelWorksheet.Cells[1, 37] = "TargetMFTSequenceNumber";
-            excelWorksheet.Cells[1, 38] = "MachineID";
-            excelWorksheet.Cells[1, 39] = "MachineMACAddress";
-            excelWorksheet.Cells[1, 40] = "TrackerCreatedOn";
-            excelWorksheet.Cells[1, 41] = "ExtraBlocksPresent";
-            excelWorksheet.Cells[1, 42] = "Arguments";
+            foreach (var column in AUTOMATIC_DESTINATION_TABLE_COLUMNS.Select((value, i) => new { i, value }))
+            {
+                excelWorksheet.Cells[1, column.i] = column.value;
+            }
 
             int row = 2;
 
@@ -409,37 +412,6 @@ namespace Marvel.Commands
                             excelWorksheet.Cells[row, 39] = tnbBlock?.MacAddress;
                             excelWorksheet.Cells[row, 40] = tnbBlock?.CreationTime.ToString();
                         }
-
-                        /*string ebPresent = string.Empty;
-
-                        foreach (var directoryEntry in ad.Directory)
-                        {
-                            if (directoryEntry.DirectoryName.Equals("Root Entry") || directoryEntry.DirectoryName.Equals("DestList"))
-                            {
-                                continue;
-                            }
-
-                            if (ad.DestListEntries.Any(t => t.EntryNumber.ToString("X") == directoryEntry.DirectoryName))
-                            {
-                                continue;
-                            }
-
-                            var directoryNameLnk = ad.GetLnkFromDirectoryName(directoryEntry.DirectoryName);
-
-                            if (directoryNameLnk.ExtraBlocks.Count > 0)
-                            {
-                                List<string> names = new();
-
-                                foreach (var extraDataBase in directoryNameLnk.ExtraBlocks)
-                                {
-                                    names.Add(extraDataBase.GetType().Name);
-                                }
-
-                                ebPresent = string.Join(", ", names);
-                            }
-                        }
-
-                        excelWorksheet.Cells[row, 41] = ebPresent;*/
 
                         if ((destEntry.Lnk?.Header.DataFlags & Lnk.Header.DataFlag.HasArguments) == Lnk.Header.DataFlag.HasArguments)
                         {
