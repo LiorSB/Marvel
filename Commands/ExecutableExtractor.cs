@@ -6,12 +6,18 @@ using Marvel.Enum;
 using Marvel.Model;
 using Marvel.Utilities;
 using Prefetch;
+using ServiceStack;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Excel = Microsoft.Office.Interop.Excel;
+using SrumData;
+using CsvHelper;
+
 
 namespace Marvel.Commands
 {
@@ -34,7 +40,13 @@ namespace Marvel.Commands
         private const string JUMP_LIST_DIRECTORY = @"%USERPROFILE%\AppData\Roaming\Microsoft\Windows\Recent\AutomaticDestinations";
         private const string AUTOMATIC_DESTINATIONS_EXCEL = @"_Parsed_Automatic_Destinations.xls";
 
+        private const string SRUM_FOLDER = @"\Srum";
+        private const string SRU_DIRECTORY = @"C:\Windows\System32\sru";
+        private const string SRUDB_FILE = @"SRUDB.dat";
+        private const string SRUDB_FILE_DIRECTORY = @"C:\Windows\System32\sru\SRUDB.dat";
+
         private const string C_DIRECTORY = "C:";
+
 
         private static readonly string[] PREFETCH_TABLE_COLUMNS = { 
             "SourceFile",
@@ -119,6 +131,8 @@ namespace Marvel.Commands
             PrefetchExtractor(host, path, selectedProtocol);
             //AmcacheExtractor(host, path, selectedProtocol); Currently bugged since can't open hive files.
             JumpListExtractor(host, path, selectedProtocol);
+            ShimcacheExtractor(host, path, selectedProtocol);
+            SrumExtractor(host, path, selectedProtocol);
 
             return $"Executable files downloaded to: {path}";
         }
@@ -145,15 +159,7 @@ namespace Marvel.Commands
 
             foreach (var column in PREFETCH_TABLE_COLUMNS.Select((value, i) => new { i, value }))
             {
-                try
-                {
-                    excelWorksheet.Cells[1, column.i + 1] = column.value;
-                }
-                catch (Exception e)
-                {
-
-                }
-                
+               excelWorksheet.Cells[1, column.i + 1] = column.value;
             }
 
             int row = 2;
@@ -453,6 +459,253 @@ namespace Marvel.Commands
 
             return $"Jump List files downloaded to: {toDirectory}";
         }
+
+        public string ShimcacheExtractor(Host host, string toDirectory, ProtocolsEnum selectedProtocol)
+        {
+            return "";
+        }
+
+        public string SrumExtractor(Host host, string toDirectory, ProtocolsEnum selectedProtocol)
+        {
+            toDirectory += SRUM_FOLDER;
+            /*DirectoryInfo pathInfo = */
+            Directory.CreateDirectory(toDirectory);
+
+            Task continuation = CommandUtilities.Instance.RunCommand(selectedProtocol, host, $"{SRU_DIRECTORY}\\{SRUDB_FILE}", toDirectory, CommandsEnum.ReceiveItem);
+            continuation.Wait();
+
+            string csv = toDirectory;
+            string dt = "yyyy-MM-dd HH:mm:ss";
+            Srum sr = null;
+            var ts = DateTimeOffset.UtcNow;
+
+            try
+            {
+                sr = new Srum($"{toDirectory}\\{SRUDB_FILE}", null);
+            }
+            catch (Exception e)
+            {
+                host.Details = $"Error processing file! Message: {e.Message}." +
+                    "\r\n\r\nThis almost always means the database is dirty and must be repaired." +
+                    " This can be verified by running 'esentutl.exe /mh SRUDB.dat' and examining the 'State' property.\n" +
+                    "If the database is dirty, **make a copy of your files**, ensure all files in the directory are not Read-only," +
+                    " open a PowerShell session as an admin," +
+                    " and repair by using the following commands (change directories to the location of SRUDB.dat first):\r\n\r\n" +
+                    "'esentutl.exe /r sru /i'\r\n'esentutl.exe /p SRUDB.dat'\r\n\r\n";
+            }
+
+            if (csv.IsNullOrEmpty() == false)
+            {
+                string outName;
+                string outFile;
+
+                StreamWriter swCsv;
+                CsvWriter csvWriter;
+
+                try
+                {
+                    outName = $"{ts:yyyyMMddHHmmss}_SrumECmd_EnergyUsage_Output.csv";
+                    outFile = Path.Combine(csv, outName);
+
+                    swCsv = new StreamWriter(outFile, false, Encoding.UTF8);
+                    csvWriter = new CsvWriter(swCsv, CultureInfo.InvariantCulture);
+
+                    var foo = csvWriter.Context.AutoMap<EnergyUsage>();
+
+                    foo.Map(t => t.Timestamp).Convert(t =>
+                        $"{t.Value.Timestamp:yyyy-MM-dd HH:mm:ss}");
+                    foo.Map(t => t.EventTimestamp).Convert(t =>
+                        $"{t.Value.EventTimestamp?.ToString(dt)}");
+
+                    csvWriter.Context.RegisterClassMap(foo);
+                    csvWriter.WriteHeader<EnergyUsage>();
+                    csvWriter.NextRecord();
+
+                    csvWriter.WriteRecords(sr.EnergyUsages.Values);
+
+                    csvWriter.Flush();
+                    swCsv.Flush();
+                }
+                catch (Exception e)
+                {
+                    host.Details = $"Error exporting 'EnergyUsage' data! Error: {e.Message}";
+                }
+
+                try
+                {
+                    outName = $"{ts:yyyyMMddHHmmss}_SrumECmd_Unknown312_Output.csv";
+                    outFile = Path.Combine(csv, outName);
+
+                    swCsv = new StreamWriter(outFile, false, Encoding.UTF8);
+                    csvWriter = new CsvWriter(swCsv, CultureInfo.InvariantCulture);
+
+                    var foo = csvWriter.Context.AutoMap<TimelineProvider>();
+
+                    foo.Map(t => t.Timestamp).Convert(t =>
+                        $"{t.Value.Timestamp:yyyy-MM-dd HH:mm:ss}");
+                    foo.Map(t => t.EndTime).Convert(t =>
+                        $"{t.Value.EndTime.ToString(dt)}");
+
+                    csvWriter.Context.RegisterClassMap(foo);
+                    csvWriter.WriteHeader<TimelineProvider>();
+                    csvWriter.NextRecord();
+
+                    csvWriter.WriteRecords(sr.TimelineProviders.Values);
+
+                    csvWriter.Flush();
+                    swCsv.Flush();
+                }
+                catch (Exception e)
+                {
+                    host.Details = $"Error exporting 'Unknown312' data! Error: {e.Message}";
+                }
+
+                try
+                {
+                    outName = $"{ts:yyyyMMddHHmmss}_SrumECmd_UnknownD8F_Output.csv";
+                    outFile = Path.Combine(csv, outName);
+
+                    swCsv = new StreamWriter(outFile, false, Encoding.UTF8);
+                    csvWriter = new CsvWriter(swCsv, CultureInfo.InvariantCulture);
+
+                    var foo = csvWriter.Context.AutoMap<Vfuprov>();
+
+                    foo.Map(t => t.Timestamp).Convert(t =>
+                        $"{t.Value.Timestamp:yyyy-MM-dd HH:mm:ss}");
+                    foo.Map(t => t.EndTime).Convert(t =>
+                        $"{t.Value.EndTime.ToString(dt)}");
+                    foo.Map(t => t.StartTime).Convert(t =>
+                        $"{t.Value.StartTime.ToString(dt)}");
+
+                    csvWriter.Context.RegisterClassMap(foo);
+                    csvWriter.WriteHeader<Vfuprov>();
+                    csvWriter.NextRecord();
+
+                    csvWriter.WriteRecords(sr.Vfuprovs.Values);
+
+                    csvWriter.Flush();
+                    swCsv.Flush();
+                }
+                catch (Exception e)
+                {
+                    host.Details = $"Error exporting 'UnknownD8F' data! Error: {e.Message}";
+                }
+
+                try
+                {
+                    outName = $"{ts:yyyyMMddHHmmss}_SrumECmd_AppResourceUseInfo_Output.csv";
+                    outFile = Path.Combine(csv, outName);
+
+                    swCsv = new StreamWriter(outFile, false, Encoding.UTF8);
+                    csvWriter = new CsvWriter(swCsv, CultureInfo.InvariantCulture);
+
+                    var foo = csvWriter.Context.AutoMap<AppResourceUseInfo>();
+
+                    foo.Map(t => t.Timestamp).Convert(t =>
+                        $"{t.Value.Timestamp:yyyy-MM-dd HH:mm:ss}");
+
+                    csvWriter.Context.RegisterClassMap(foo);
+                    csvWriter.WriteHeader<AppResourceUseInfo>();
+                    csvWriter.NextRecord();
+
+                    csvWriter.WriteRecords(sr.AppResourceUseInfos.Values);
+
+                    csvWriter.Flush();
+                    swCsv.Flush();
+                }
+                catch (Exception e)
+                {
+                    host.Details = $"Error exporting 'AppResourceUseInfo' data! Error: {e.Message}";
+                }
+
+                try
+                {
+                    outName = $"{ts:yyyyMMddHHmmss}_SrumECmd_NetworkConnections_Output.csv";
+
+                    outFile = Path.Combine(csv, outName);
+                    swCsv = new StreamWriter(outFile, false, Encoding.UTF8);
+
+                    csvWriter = new CsvWriter(swCsv, CultureInfo.InvariantCulture);
+
+                    var foo = csvWriter.Context.AutoMap<NetworkConnection>();
+
+                    foo.Map(t => t.Timestamp).Convert(t =>
+                        $"{t.Value.Timestamp:yyyy-MM-dd HH:mm:ss}");
+                    foo.Map(t => t.ConnectStartTime).Convert(t =>
+                        $"{t.Value.ConnectStartTime.ToString(dt)}");
+
+                    csvWriter.Context.RegisterClassMap(foo);
+                    csvWriter.WriteHeader<NetworkConnection>();
+                    csvWriter.NextRecord();
+
+                    csvWriter.WriteRecords(sr.NetworkConnections.Values);
+
+                    csvWriter.Flush();
+                    swCsv.Flush();
+                }
+                catch (Exception e)
+                {
+                    host.Details = $"Error exporting 'NetworkConnection' data! Error: {e.Message}";
+                }
+
+                try
+                {
+                    outName = $"{ts:yyyyMMddHHmmss}_SrumECmd_NetworkUsages_Output.csv";
+                    outFile = Path.Combine(csv, outName);
+
+                    swCsv = new StreamWriter(outFile, false, Encoding.UTF8);
+                    csvWriter = new CsvWriter(swCsv, CultureInfo.InvariantCulture);
+
+                    var foo = csvWriter.Context.AutoMap<NetworkUsage>();
+
+                    foo.Map(t => t.Timestamp).Convert(t =>
+                        $"{t.Value.Timestamp:yyyy-MM-dd HH:mm:ss}");
+
+                    csvWriter.Context.RegisterClassMap(foo);
+                    csvWriter.WriteHeader<NetworkUsage>();
+                    csvWriter.NextRecord();
+
+                    csvWriter.WriteRecords(sr.NetworkUsages.Values);
+
+                    csvWriter.Flush();
+                    swCsv.Flush();
+                }
+                catch (Exception e)
+                {
+                    host.Details = $"Error exporting 'NetworkUsage' data! Error: {e.Message}";
+                }
+
+                try
+                {
+                    outName = $"{ts:yyyyMMddHHmmss}_SrumECmd_PushNotifications_Output.csv";
+                    outFile = Path.Combine(csv, outName);
+
+                    swCsv = new StreamWriter(outFile, false, Encoding.UTF8);
+                    csvWriter = new CsvWriter(swCsv, CultureInfo.InvariantCulture);
+
+                    var foo = csvWriter.Context.AutoMap<PushNotification>();
+
+                    foo.Map(t => t.Timestamp).Convert(t =>
+                        $"{t.Value.Timestamp:yyyy-MM-dd HH:mm:ss}");
+
+                    csvWriter.Context.RegisterClassMap(foo);
+                    csvWriter.WriteHeader<PushNotification>();
+                    csvWriter.NextRecord();
+
+                    csvWriter.WriteRecords(sr.PushNotifications.Values);
+
+                    csvWriter.Flush();
+                    swCsv.Flush();
+                }
+                catch (Exception e)
+                {
+                    host.Details = $"Error exporting 'PushNotification' data! Error: {e.Message}";
+                }
+            }
+
+            return $"Srum information parsed in: {toDirectory}";
+        }
+
         private static string GetAbsolutePathFromTargetIDs(List<Lnk.ShellItems.ShellBag> ids)
         {
             if (ids == null)
@@ -476,5 +729,6 @@ namespace Marvel.Commands
 
             return absPath;
         }
+
     }
 }
