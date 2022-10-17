@@ -38,6 +38,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\FileStore\FileStore.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="PECmd">
       <HintPath>ExternalDLLs\PECmd.dll</HintPath>
     </Reference>

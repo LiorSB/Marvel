@@ -40,6 +40,9 @@ namespace Marvel.Commands
         private const string JUMP_LIST_DIRECTORY = @"%USERPROFILE%\AppData\Roaming\Microsoft\Windows\Recent\AutomaticDestinations";
         private const string AUTOMATIC_DESTINATIONS_EXCEL = @"_Parsed_Automatic_Destinations.xls";
 
+        private const string SHIMCACHE_FOLDER = @"\Shimcache";
+        private const string REMOTE_SHIMCACHE_FOLDER = @"C:\Marvel\Shimcache";
+
         private const string SRUM_FOLDER = @"\Srum";
         private const string SRU_DIRECTORY = @"C:\Windows\System32\sru";
         private const string SRUDB_FILE = @"SRUDB.dat";
@@ -128,10 +131,10 @@ namespace Marvel.Commands
 
             DirectoryInfo hostDirectoryInfo = Directory.CreateDirectory(path);
 
-            PrefetchExtractor(host, path, selectedProtocol);
-            //AmcacheExtractor(host, path, selectedProtocol); Currently bugged since can't open hive files.
-            JumpListExtractor(host, path, selectedProtocol);
-            ShimcacheExtractor(host, path, selectedProtocol);
+            //PrefetchExtractor(host, path, selectedProtocol);
+            //AmcacheExtractor(host, path, selectedProtocol); // Bugged: Hive files can't be open for read, because they are locked by another resource.
+            //JumpListExtractor(host, path, selectedProtocol);
+            //ShimcacheExtractor(host, path, selectedProtocol);
             SrumExtractor(host, path, selectedProtocol);
 
             return $"Executable files downloaded to: {path}";
@@ -472,6 +475,8 @@ namespace Marvel.Commands
 
         public string ShimcacheExtractor(Host host, string toDirectory, ProtocolsEnum selectedProtocol)
         {
+            Directory.CreateDirectory(REMOTE_SHIMCACHE_FOLDER);
+            File.WriteAllBytes($"{REMOTE_SHIMCACHE_FOLDER}/AppCompatCacheParser.zip" , FileStore.Resource.AppCompatCacheParser);
             return "";
         }
 
@@ -495,7 +500,7 @@ namespace Marvel.Commands
             }
             catch (Exception e)
             {
-                host.Details = $"Error processing file! Message: {e.Message}." +
+                return $"Error processing file! Message: {e.Message}." +
                     "\r\n\r\nThis almost always means the database is dirty and must be repaired." +
                     " This can be verified by running 'esentutl.exe /mh SRUDB.dat' and examining the 'State' property.\n" +
                     "If the database is dirty, **make a copy of your files**, ensure all files in the directory are not Read-only," +

@@ -63,7 +63,7 @@ namespace Marvel.Commands
 
         public string GetUserProfileDirectory(Host host, string directory)
         {
-            if (directory[0] != '%')
+            if (directory != null && directory[0] != '%')
             {
                 return directory;
             }
