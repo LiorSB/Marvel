@@ -64,7 +64,7 @@ namespace Marvel.Utilities
                 CommandsEnum.ReceiveItem => Task.Run(() => host.Details += _protocolCommands[selectedProtocol].ReceiveItem(host, fromDirectory, toDirectory) + NEW_LINE),
                 CommandsEnum.SendItem => Task.Run(() => host.Details += _protocolCommands[selectedProtocol].SendItem(host, fromDirectory, toDirectory) + NEW_LINE),
                 CommandsEnum.GetFolder => Task.Run(() => host.Details += _protocolCommands[selectedProtocol].GetFolder(host, fromDirectory, toDirectory) + NEW_LINE),
-                CommandsEnum.GetSystemInformation => Task.Run(() => host.SystemInformation += _protocolCommands[selectedProtocol].GetSystemInformation(host.IP) + NEW_LINE),
+                CommandsEnum.GetSystemInformation => Task.Run(() => host.SystemInformation += _protocolCommands[selectedProtocol].GetSystemInformation(host) + NEW_LINE),
                 CommandsEnum.PingIP => Task.Run(() => host.PortsConnectivity += _protocolCommands[selectedProtocol].PingIP(host.IP) + NEW_LINE),
                 CommandsEnum.PortConnectivity => Task.Run(() => host.PortsConnectivity += _protocolCommands[selectedProtocol].PortConnectivity(host.IP) + NEW_LINE),
                 CommandsEnum.ExtractExecutables => Task.Run(() => host.Details += _executableExtractor.ExtractFiles(host, toDirectory, selectedProtocol) + NEW_LINE),

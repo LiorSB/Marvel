@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using Microsoft.Isam.Esent.Interop;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace Marvel.Model
@@ -12,6 +13,7 @@ namespace Marvel.Model
         private string _details;
         private string _portsConnectivity;
         private string _systemInformation;
+        private static object _synchronizeAccess = new();
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -71,8 +73,11 @@ namespace Marvel.Model
             }
             set
             {
-                _details = value;
-                NotifyPropertyChanged();
+                lock (_synchronizeAccess)
+                {
+                    _details = value;
+                    NotifyPropertyChanged();
+                }
             }
         }
         public string PortsConnectivity
@@ -83,8 +88,11 @@ namespace Marvel.Model
             }
             set
             {
-                _portsConnectivity = value;
-                NotifyPropertyChanged();
+                lock (_synchronizeAccess)
+                {
+                    _portsConnectivity = value;
+                    NotifyPropertyChanged();
+                }
             }
         }
         public string SystemInformation
@@ -95,8 +103,11 @@ namespace Marvel.Model
             }
             set
             {
-                _systemInformation = value;
-                NotifyPropertyChanged();
+                lock (_synchronizeAccess)
+                {
+                    _systemInformation = value;
+                    NotifyPropertyChanged();
+                }
             }
         }
 

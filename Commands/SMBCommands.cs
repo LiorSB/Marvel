@@ -176,7 +176,7 @@ namespace Marvel.Commands
             return RunProcess(process);
         }
 
-        public string GetSystemInformation(string ip)
+        public string GetSystemInformation(Host host)
         {
             return null;
         }

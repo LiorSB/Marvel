@@ -134,7 +134,7 @@ namespace Marvel.Commands
             return "Downloaded to " + toDirectory;
         }
 
-        public string GetSystemInformation(string ip)
+        public string GetSystemInformation(Host host)
         {
             return null;
         }
