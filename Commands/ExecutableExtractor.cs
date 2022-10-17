@@ -153,6 +153,11 @@ namespace Marvel.Commands
                 toDirectory += PREFETCH_FOLDER;
             }
 
+            if (!Directory.Exists(toDirectory))
+            {
+                return $"Failed to pull {PREFETCH_DIRECTORY}";
+            }
+
             Excel.Application excelApp = new Excel.Application();
             Excel.Workbook excelWorkbook = excelApp.Workbooks.Add();
             Excel.Worksheet excelWorksheet = (Excel.Worksheet)excelWorkbook.Sheets.Add();
@@ -308,6 +313,11 @@ namespace Marvel.Commands
             if (selectedProtocol == ProtocolsEnum.WinRM)
             {
                 toDirectory += AUTOMATIC_DESTINATIONS_FOLDER;
+            }
+
+            if (!Directory.Exists(toDirectory))
+            {
+                return $"Failed to pull {JUMP_LIST_DIRECTORY}";
             }
 
             int numberOfFilesToDownload = 20;
