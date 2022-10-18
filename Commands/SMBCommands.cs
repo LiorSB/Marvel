@@ -63,7 +63,7 @@ namespace Marvel.Commands
 
         public string GetUserProfileDirectory(Host host, string directory)
         {
-            if (directory[0] != '%')
+            if (directory != null && directory[0] != '%')
             {
                 return directory;
             }
@@ -176,7 +176,7 @@ namespace Marvel.Commands
             return RunProcess(process);
         }
 
-        public string GetSystemInformation(string ip)
+        public string GetSystemInformation(Host host)
         {
             return null;
         }

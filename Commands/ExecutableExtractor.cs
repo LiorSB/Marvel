@@ -6,12 +6,18 @@ using Marvel.Enum;
 using Marvel.Model;
 using Marvel.Utilities;
 using Prefetch;
+using ServiceStack;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Excel = Microsoft.Office.Interop.Excel;
+using SrumData;
+using CsvHelper;
+
 
 namespace Marvel.Commands
 {
@@ -34,7 +40,89 @@ namespace Marvel.Commands
         private const string JUMP_LIST_DIRECTORY = @"%USERPROFILE%\AppData\Roaming\Microsoft\Windows\Recent\AutomaticDestinations";
         private const string AUTOMATIC_DESTINATIONS_EXCEL = @"_Parsed_Automatic_Destinations.xls";
 
+        private const string SHIMCACHE_FOLDER = @"\Shimcache";
+        private const string REMOTE_SHIMCACHE_FOLDER = @"C:\Marvel\Shimcache";
+
+        private const string SRUM_FOLDER = @"\Srum";
+        private const string SRU_DIRECTORY = @"C:\Windows\System32\sru";
+        private const string SRUDB_FILE = @"SRUDB.dat";
+        private const string SRUDB_FILE_DIRECTORY = @"C:\Windows\System32\sru\SRUDB.dat";
+
         private const string C_DIRECTORY = "C:";
+
+
+        private static readonly string[] PREFETCH_TABLE_COLUMNS = { 
+            "SourceFile",
+            "SourceCreated",
+            "SourceModified",
+            "SourceAccessed",
+            "ExecutableName", 
+            "Hash", 
+            "Size", 
+            "Version", 
+            "RunCount",
+            "LastRun",
+            "PreviousRun0", 
+            "PreviousRun1", 
+            "PreviousRun2", 
+            "PreviousRun3", 
+            "PreviousRun4", 
+            "PreviousRun5", 
+            "PreviousRun6", 
+            "Volume0Name",
+            "Volume0Serial",
+            "Volume0Created", 
+            "Volume1Name", 
+            "Volume1Serial",
+            "Volume1Created", 
+            "Directories",
+            "FilesLoaded",
+            "ParsingError"
+        };
+        private static readonly string[] AUTOMATIC_DESTINATION_TABLE_COLUMNS = {
+            "SourceFile",
+            "SourceCreated",
+            "SourceModified",
+            "SourceAccessed",
+            "AppId",
+            "AppIdDescription",
+            "DestListVersion",
+            "LastUsedEntryNumber",
+            "MRU",
+            "EntryNumber",
+            "CreationTime",
+            "LastModified",
+            "Hostname",
+            "MacAddress",
+            "Path",
+            "InteractionCount",
+            "PinStatus",
+            "FileBirthDroid",
+            "FileDroid",
+            "VolumeBirthDroid",
+            "VolumeDroid",
+            "TargetCreated",
+            "TargetModified",
+            "TargetAccessed",
+            "FileSize",
+            "RelativePath",
+            "WorkingDirectory",
+            "FileAttributes",
+            "HeaderFlags",
+            "DriveType",
+            "VolumeSerialNumber",
+            "VolumeLabel",
+            "LocalPath",
+            "CommonPath",
+            "TargetIDAbsolutePath",
+            "TargetMFTEntryNumber",
+            "TargetMFTSequenceNumber",
+            "MachineID",
+            "MachineMACAddress",
+            "TrackerCreatedOn",
+            "ExtraBlocksPresent",
+            "Arguments" 
+        };
 
         public string ExtractFiles(Host host, string toDirectory, ProtocolsEnum selectedProtocol)
         {
@@ -44,8 +132,10 @@ namespace Marvel.Commands
             DirectoryInfo hostDirectoryInfo = Directory.CreateDirectory(path);
 
             PrefetchExtractor(host, path, selectedProtocol);
-            //AmcacheExtractor(host, path, selectedProtocol); Currently bugged since can't open hive files.
+            //AmcacheExtractor(host, path, selectedProtocol); // Bugged: Hive files can't be open for read, because they are locked by another resource.
             JumpListExtractor(host, path, selectedProtocol);
+            //ShimcacheExtractor(host, path, selectedProtocol);
+            SrumExtractor(host, path, selectedProtocol);
 
             return $"Executable files downloaded to: {path}";
         }
@@ -66,36 +156,19 @@ namespace Marvel.Commands
                 toDirectory += PREFETCH_FOLDER;
             }
 
+            if (!Directory.Exists(toDirectory))
+            {
+                return $"Failed to pull {PREFETCH_DIRECTORY}";
+            }
+
             Excel.Application excelApp = new Excel.Application();
             Excel.Workbook excelWorkbook = excelApp.Workbooks.Add();
             Excel.Worksheet excelWorksheet = (Excel.Worksheet)excelWorkbook.Sheets.Add();
 
-            excelWorksheet.Cells[1, 1] = "SourceFile";
-            excelWorksheet.Cells[1, 2] = "SourceCreated";
-            excelWorksheet.Cells[1, 3] = "SourceModified";
-            excelWorksheet.Cells[1, 4] = "SourceAccessed";
-            excelWorksheet.Cells[1, 5] = "ExecutableName";
-            excelWorksheet.Cells[1, 6] = "Hash";
-            excelWorksheet.Cells[1, 7] = "Size";
-            excelWorksheet.Cells[1, 8] = "Version";
-            excelWorksheet.Cells[1, 9] = "RunCount";
-            excelWorksheet.Cells[1, 10] = "LastRun";
-            excelWorksheet.Cells[1, 11] = "PreviousRun0";
-            excelWorksheet.Cells[1, 12] = "PreviousRun1";
-            excelWorksheet.Cells[1, 13] = "PreviousRun2";
-            excelWorksheet.Cells[1, 14] = "PreviousRun3";
-            excelWorksheet.Cells[1, 15] = "PreviousRun4";
-            excelWorksheet.Cells[1, 16] = "PreviousRun5";
-            excelWorksheet.Cells[1, 17] = "PreviousRun6";
-            excelWorksheet.Cells[1, 18] = "Volume0Name";
-            excelWorksheet.Cells[1, 19] = "Volume0Serial";
-            excelWorksheet.Cells[1, 20] = "Volume0Created";
-            excelWorksheet.Cells[1, 21] = "Volume1Name";
-            excelWorksheet.Cells[1, 22] = "Volume1Serial";
-            excelWorksheet.Cells[1, 23] = "Volume1Created";
-            excelWorksheet.Cells[1, 24] = "Directories";
-            excelWorksheet.Cells[1, 25] = "FilesLoaded";
-            excelWorksheet.Cells[1, 26] = "ParsingError";
+            foreach (var column in PREFETCH_TABLE_COLUMNS.Select((value, i) => new { i, value }))
+            {
+               excelWorksheet.Cells[1, column.i + 1] = column.value;
+            }
 
             int row = 2;
 
@@ -174,16 +247,6 @@ namespace Marvel.Commands
 
                     row += 1;
 
-                    /*foreach (string fileName in pf.Filenames)
-                    {
-                        if (!fileName.Contains(EXE_FORMAT_LOWER_CASE) && !fileName.Contains(EXE_FORMAT_UPPER_CASE))
-                        {
-                            continue;
-                        }
-
-                        
-                    }*/
-
                     CommandUtilities.Instance.RunCommand(selectedProtocol, host, executablePath, toDirectory, CommandsEnum.ReceiveItem);
                 }
                 catch (Exception e)
@@ -255,54 +318,21 @@ namespace Marvel.Commands
                 toDirectory += AUTOMATIC_DESTINATIONS_FOLDER;
             }
 
+            if (!Directory.Exists(toDirectory))
+            {
+                return $"Failed to pull {JUMP_LIST_DIRECTORY}";
+            }
+
             int numberOfFilesToDownload = 20;
 
             Excel.Application excelApp = new Excel.Application();
             Excel.Workbook excelWorkbook = excelApp.Workbooks.Add();
             Excel.Worksheet excelWorksheet = (Excel.Worksheet)excelWorkbook.Sheets.Add();
 
-            excelWorksheet.Cells[1, 1] = "SourceFile";
-            excelWorksheet.Cells[1, 2] = "SourceCreated";
-            excelWorksheet.Cells[1, 3] = "SourceModified";
-            excelWorksheet.Cells[1, 4] = "SourceAccessed";
-            excelWorksheet.Cells[1, 5] = "AppId";
-            excelWorksheet.Cells[1, 6] = "AppIdDescription";
-            excelWorksheet.Cells[1, 7] = "DestListVersion";
-            excelWorksheet.Cells[1, 8] = "LastUsedEntryNumber";
-            excelWorksheet.Cells[1, 9] = "MRU";
-            excelWorksheet.Cells[1, 10] = "EntryNumber";
-            excelWorksheet.Cells[1, 11] = "CreationTime";
-            excelWorksheet.Cells[1, 12] = "LastModified";
-            excelWorksheet.Cells[1, 13] = "Hostname";
-            excelWorksheet.Cells[1, 14] = "MacAddress";
-            excelWorksheet.Cells[1, 15] = "Path";
-            excelWorksheet.Cells[1, 16] = "InteractionCount";
-            excelWorksheet.Cells[1, 17] = "PinStatus";
-            excelWorksheet.Cells[1, 18] = "FileBirthDroid";
-            excelWorksheet.Cells[1, 19] = "FileDroid";
-            excelWorksheet.Cells[1, 20] = "VolumeBirthDroid";
-            excelWorksheet.Cells[1, 21] = "VolumeDroid";
-            excelWorksheet.Cells[1, 22] = "TargetCreated";
-            excelWorksheet.Cells[1, 23] = "TargetModified";
-            excelWorksheet.Cells[1, 24] = "TargetAccessed";
-            excelWorksheet.Cells[1, 25] = "FileSize";
-            excelWorksheet.Cells[1, 26] = "RelativePath";
-            excelWorksheet.Cells[1, 27] = "WorkingDirectory";
-            excelWorksheet.Cells[1, 28] = "FileAttributes";
-            excelWorksheet.Cells[1, 29] = "HeaderFlags";
-            excelWorksheet.Cells[1, 30] = "DriveType";
-            excelWorksheet.Cells[1, 31] = "VolumeSerialNumber";
-            excelWorksheet.Cells[1, 32] = "VolumeLabel";
-            excelWorksheet.Cells[1, 33] = "LocalPath";
-            excelWorksheet.Cells[1, 34] = "CommonPath";
-            excelWorksheet.Cells[1, 35] = "TargetIDAbsolutePath";
-            excelWorksheet.Cells[1, 36] = "TargetMFTEntryNumber";
-            excelWorksheet.Cells[1, 37] = "TargetMFTSequenceNumber";
-            excelWorksheet.Cells[1, 38] = "MachineID";
-            excelWorksheet.Cells[1, 39] = "MachineMACAddress";
-            excelWorksheet.Cells[1, 40] = "TrackerCreatedOn";
-            excelWorksheet.Cells[1, 41] = "ExtraBlocksPresent";
-            excelWorksheet.Cells[1, 42] = "Arguments";
+            foreach (var column in AUTOMATIC_DESTINATION_TABLE_COLUMNS.Select((value, i) => new { i, value }))
+            {
+                excelWorksheet.Cells[1, column.i + 1] = column.value;
+            }
 
             int row = 2;
 
@@ -410,37 +440,6 @@ namespace Marvel.Commands
                             excelWorksheet.Cells[row, 40] = tnbBlock?.CreationTime.ToString();
                         }
 
-                        /*string ebPresent = string.Empty;
-
-                        foreach (var directoryEntry in ad.Directory)
-                        {
-                            if (directoryEntry.DirectoryName.Equals("Root Entry") || directoryEntry.DirectoryName.Equals("DestList"))
-                            {
-                                continue;
-                            }
-
-                            if (ad.DestListEntries.Any(t => t.EntryNumber.ToString("X") == directoryEntry.DirectoryName))
-                            {
-                                continue;
-                            }
-
-                            var directoryNameLnk = ad.GetLnkFromDirectoryName(directoryEntry.DirectoryName);
-
-                            if (directoryNameLnk.ExtraBlocks.Count > 0)
-                            {
-                                List<string> names = new();
-
-                                foreach (var extraDataBase in directoryNameLnk.ExtraBlocks)
-                                {
-                                    names.Add(extraDataBase.GetType().Name);
-                                }
-
-                                ebPresent = string.Join(", ", names);
-                            }
-                        }
-
-                        excelWorksheet.Cells[row, 41] = ebPresent;*/
-
                         if ((destEntry.Lnk?.Header.DataFlags & Lnk.Header.DataFlag.HasArguments) == Lnk.Header.DataFlag.HasArguments)
                         {
                             excelWorksheet.Cells[row, 42] = destEntry.Lnk?.Arguments ?? string.Empty;
@@ -473,6 +472,255 @@ namespace Marvel.Commands
 
             return $"Jump List files downloaded to: {toDirectory}";
         }
+
+        public string ShimcacheExtractor(Host host, string toDirectory, ProtocolsEnum selectedProtocol)
+        {
+            Directory.CreateDirectory(REMOTE_SHIMCACHE_FOLDER);
+            File.WriteAllBytes($"{REMOTE_SHIMCACHE_FOLDER}/AppCompatCacheParser.zip" , FileStore.Resource.AppCompatCacheParser);
+            return "";
+        }
+
+        public string SrumExtractor(Host host, string toDirectory, ProtocolsEnum selectedProtocol)
+        {
+            toDirectory += SRUM_FOLDER;
+            /*DirectoryInfo pathInfo = */
+            Directory.CreateDirectory(toDirectory);
+
+            Task continuation = CommandUtilities.Instance.RunCommand(selectedProtocol, host, $"{SRU_DIRECTORY}\\{SRUDB_FILE}", toDirectory, CommandsEnum.ReceiveItem);
+            continuation.Wait();
+
+            string csv = toDirectory;
+            string dt = "yyyy-MM-dd HH:mm:ss";
+            Srum sr = null;
+            var ts = DateTimeOffset.UtcNow;
+
+            try
+            {
+                sr = new Srum($"{toDirectory}\\{SRUDB_FILE}", null);
+            }
+            catch (Exception e)
+            {
+                return $"Error processing file! Message: {e.Message}." +
+                    "\r\n\r\nThis almost always means the database is dirty and must be repaired." +
+                    " This can be verified by running 'esentutl.exe /mh SRUDB.dat' and examining the 'State' property.\n" +
+                    "If the database is dirty, **make a copy of your files**, ensure all files in the directory are not Read-only," +
+                    " open a PowerShell session as an admin," +
+                    " and repair by using the following commands (change directories to the location of SRUDB.dat first):\r\n\r\n" +
+                    "'esentutl.exe /r sru /i'\r\n'esentutl.exe /p SRUDB.dat'\r\n\r\n";
+            }
+
+            if (csv.IsNullOrEmpty() == false)
+            {
+                string outName;
+                string outFile;
+
+                StreamWriter swCsv;
+                CsvWriter csvWriter;
+
+                try
+                {
+                    outName = $"{ts:yyyyMMddHHmmss}_SrumECmd_EnergyUsage_Output.csv";
+                    outFile = Path.Combine(csv, outName);
+
+                    swCsv = new StreamWriter(outFile, false, Encoding.UTF8);
+                    csvWriter = new CsvWriter(swCsv, CultureInfo.InvariantCulture);
+
+                    var foo = csvWriter.Context.AutoMap<EnergyUsage>();
+
+                    foo.Map(t => t.Timestamp).Convert(t =>
+                        $"{t.Value.Timestamp:yyyy-MM-dd HH:mm:ss}");
+                    foo.Map(t => t.EventTimestamp).Convert(t =>
+                        $"{t.Value.EventTimestamp?.ToString(dt)}");
+
+                    csvWriter.Context.RegisterClassMap(foo);
+                    csvWriter.WriteHeader<EnergyUsage>();
+                    csvWriter.NextRecord();
+
+                    csvWriter.WriteRecords(sr.EnergyUsages.Values);
+
+                    csvWriter.Flush();
+                    swCsv.Flush();
+                }
+                catch (Exception e)
+                {
+                    host.UpdateHostDetails($"Error exporting 'EnergyUsage' data! Error: {e.Message}");
+                }
+
+                try
+                {
+                    outName = $"{ts:yyyyMMddHHmmss}_SrumECmd_Unknown312_Output.csv";
+                    outFile = Path.Combine(csv, outName);
+
+                    swCsv = new StreamWriter(outFile, false, Encoding.UTF8);
+                    csvWriter = new CsvWriter(swCsv, CultureInfo.InvariantCulture);
+
+                    var foo = csvWriter.Context.AutoMap<TimelineProvider>();
+
+                    foo.Map(t => t.Timestamp).Convert(t =>
+                        $"{t.Value.Timestamp:yyyy-MM-dd HH:mm:ss}");
+                    foo.Map(t => t.EndTime).Convert(t =>
+                        $"{t.Value.EndTime.ToString(dt)}");
+
+                    csvWriter.Context.RegisterClassMap(foo);
+                    csvWriter.WriteHeader<TimelineProvider>();
+                    csvWriter.NextRecord();
+
+                    csvWriter.WriteRecords(sr.TimelineProviders.Values);
+
+                    csvWriter.Flush();
+                    swCsv.Flush();
+                }
+                catch (Exception e)
+                {
+                    host.UpdateHostDetails($"Error exporting 'Unknown312' data! Error: {e.Message}");
+                }
+
+                try
+                {
+                    outName = $"{ts:yyyyMMddHHmmss}_SrumECmd_UnknownD8F_Output.csv";
+                    outFile = Path.Combine(csv, outName);
+
+                    swCsv = new StreamWriter(outFile, false, Encoding.UTF8);
+                    csvWriter = new CsvWriter(swCsv, CultureInfo.InvariantCulture);
+
+                    var foo = csvWriter.Context.AutoMap<Vfuprov>();
+
+                    foo.Map(t => t.Timestamp).Convert(t =>
+                        $"{t.Value.Timestamp:yyyy-MM-dd HH:mm:ss}");
+                    foo.Map(t => t.EndTime).Convert(t =>
+                        $"{t.Value.EndTime.ToString(dt)}");
+                    foo.Map(t => t.StartTime).Convert(t =>
+                        $"{t.Value.StartTime.ToString(dt)}");
+
+                    csvWriter.Context.RegisterClassMap(foo);
+                    csvWriter.WriteHeader<Vfuprov>();
+                    csvWriter.NextRecord();
+
+                    csvWriter.WriteRecords(sr.Vfuprovs.Values);
+
+                    csvWriter.Flush();
+                    swCsv.Flush();
+                }
+                catch (Exception e)
+                {
+                    host.UpdateHostDetails($"Error exporting 'UnknownD8F' data! Error: {e.Message}");
+                }
+
+                try
+                {
+                    outName = $"{ts:yyyyMMddHHmmss}_SrumECmd_AppResourceUseInfo_Output.csv";
+                    outFile = Path.Combine(csv, outName);
+
+                    swCsv = new StreamWriter(outFile, false, Encoding.UTF8);
+                    csvWriter = new CsvWriter(swCsv, CultureInfo.InvariantCulture);
+
+                    var foo = csvWriter.Context.AutoMap<AppResourceUseInfo>();
+
+                    foo.Map(t => t.Timestamp).Convert(t =>
+                        $"{t.Value.Timestamp:yyyy-MM-dd HH:mm:ss}");
+
+                    csvWriter.Context.RegisterClassMap(foo);
+                    csvWriter.WriteHeader<AppResourceUseInfo>();
+                    csvWriter.NextRecord();
+
+                    csvWriter.WriteRecords(sr.AppResourceUseInfos.Values);
+
+                    csvWriter.Flush();
+                    swCsv.Flush();
+                }
+                catch (Exception e)
+                {
+                    host.UpdateHostDetails($"Error exporting 'AppResourceUseInfo' data! Error: {e.Message}");
+                }
+
+                try
+                {
+                    outName = $"{ts:yyyyMMddHHmmss}_SrumECmd_NetworkConnections_Output.csv";
+
+                    outFile = Path.Combine(csv, outName);
+                    swCsv = new StreamWriter(outFile, false, Encoding.UTF8);
+
+                    csvWriter = new CsvWriter(swCsv, CultureInfo.InvariantCulture);
+
+                    var foo = csvWriter.Context.AutoMap<NetworkConnection>();
+
+                    foo.Map(t => t.Timestamp).Convert(t =>
+                        $"{t.Value.Timestamp:yyyy-MM-dd HH:mm:ss}");
+                    foo.Map(t => t.ConnectStartTime).Convert(t =>
+                        $"{t.Value.ConnectStartTime.ToString(dt)}");
+
+                    csvWriter.Context.RegisterClassMap(foo);
+                    csvWriter.WriteHeader<NetworkConnection>();
+                    csvWriter.NextRecord();
+
+                    csvWriter.WriteRecords(sr.NetworkConnections.Values);
+
+                    csvWriter.Flush();
+                    swCsv.Flush();
+                }
+                catch (Exception e)
+                {
+                    host.UpdateHostDetails($"Error exporting 'NetworkConnection' data! Error: {e.Message}");
+                }
+
+                try
+                {
+                    outName = $"{ts:yyyyMMddHHmmss}_SrumECmd_NetworkUsages_Output.csv";
+                    outFile = Path.Combine(csv, outName);
+
+                    swCsv = new StreamWriter(outFile, false, Encoding.UTF8);
+                    csvWriter = new CsvWriter(swCsv, CultureInfo.InvariantCulture);
+
+                    var foo = csvWriter.Context.AutoMap<NetworkUsage>();
+
+                    foo.Map(t => t.Timestamp).Convert(t =>
+                        $"{t.Value.Timestamp:yyyy-MM-dd HH:mm:ss}");
+
+                    csvWriter.Context.RegisterClassMap(foo);
+                    csvWriter.WriteHeader<NetworkUsage>();
+                    csvWriter.NextRecord();
+
+                    csvWriter.WriteRecords(sr.NetworkUsages.Values);
+
+                    csvWriter.Flush();
+                    swCsv.Flush();
+                }
+                catch (Exception e)
+                {
+                    host.UpdateHostDetails($"Error exporting 'NetworkUsage' data! Error: {e.Message}");
+                }
+
+                try
+                {
+                    outName = $"{ts:yyyyMMddHHmmss}_SrumECmd_PushNotifications_Output.csv";
+                    outFile = Path.Combine(csv, outName);
+
+                    swCsv = new StreamWriter(outFile, false, Encoding.UTF8);
+                    csvWriter = new CsvWriter(swCsv, CultureInfo.InvariantCulture);
+
+                    var foo = csvWriter.Context.AutoMap<PushNotification>();
+
+                    foo.Map(t => t.Timestamp).Convert(t =>
+                        $"{t.Value.Timestamp:yyyy-MM-dd HH:mm:ss}");
+
+                    csvWriter.Context.RegisterClassMap(foo);
+                    csvWriter.WriteHeader<PushNotification>();
+                    csvWriter.NextRecord();
+
+                    csvWriter.WriteRecords(sr.PushNotifications.Values);
+
+                    csvWriter.Flush();
+                    swCsv.Flush();
+                }
+                catch (Exception e)
+                {
+                    host.UpdateHostDetails($"Error exporting 'PushNotification' data! Error: {e.Message}");
+                }
+            }
+
+            return $"Srum information parsed in: {toDirectory}";
+        }
+
         private static string GetAbsolutePathFromTargetIDs(List<Lnk.ShellItems.ShellBag> ids)
         {
             if (ids == null)
@@ -496,5 +744,6 @@ namespace Marvel.Commands
 
             return absPath;
         }
+
     }
 }

@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using Marvel.Enum;
 using Marvel.Model;
 using Marvel.Utilities;
+using System.Threading.Tasks;
 
 namespace Marvel.ViewModel
 {
@@ -36,6 +37,7 @@ namespace Marvel.ViewModel
         private CommandsEnum _selectedCommand;
         private ObservableCollection<Host> _hostList = new();
         private Host _selectedHost;
+        private bool _isRunningCommand = false;
 
         public List<CommandsEnum> FromDirectoryEnabled => new()
         {
@@ -133,6 +135,19 @@ namespace Marvel.ViewModel
             set
             {
                 _selectedHost = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public bool IsRunningCommand
+        {
+            get
+            {
+                return _isRunningCommand;
+            }
+            set
+            {
+                _isRunningCommand = value;
                 NotifyPropertyChanged();
             }
         }
@@ -413,6 +428,7 @@ namespace Marvel.ViewModel
             }
 
             string text = System.IO.File.ReadAllText(_hostsFileDirectory);
+            text = Regex.Replace(text, @"\s+", "");
 
             /*Regex ipRegex = new Regex(@"\b(\d{1,3}\.){3}\d{1,3}\b");
             MatchCollection resultIP = ipRegex.Matches(text);
@@ -423,7 +439,7 @@ namespace Marvel.ViewModel
                 HostList.Add(newHost);
             }*/
 
-            string[] splittedText = text.Split();
+            string[] splittedText = text.Split(",");
 
             for (int i = 0; i < splittedText.Length; i += 3)
             {
@@ -472,7 +488,10 @@ namespace Marvel.ViewModel
                 {
                     int index = i;
 
-                    CommandUtilities.Instance.RunCommand(_selectedProtocol, HostList[index], _fromDirectory, _toDirectory, _selectedCommand);
+                    IsRunningCommand = true;
+                    Task runCommandTask = CommandUtilities.Instance.RunCommand(_selectedProtocol, HostList[index], _fromDirectory, _toDirectory, _selectedCommand);
+
+                    runCommandTask.ContinueWith((t) => IsRunningCommand = false);
                 }
             }
         }

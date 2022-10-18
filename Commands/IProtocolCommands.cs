@@ -9,7 +9,7 @@ namespace Marvel.Commands
         public string ReceiveItem(Host host, string fromDirectory, string toDirectory);
         public string SendItem(Host host, string fromDirectory, string toDirectory);
         public string GetFolder(Host host, string fromDirectory, string toDirectory);
-        public string GetSystemInformation(string ip);
+        public string GetSystemInformation(Host host);
         public string PingIP(string ip);
         public string PortConnectivity(string ip);
     }

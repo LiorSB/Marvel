@@ -108,7 +108,7 @@ namespace Marvel.Commands
             return RunPowerShell(ps);
         }
 
-        public string GetSystemInformation(string ip)
+        public string GetSystemInformation(Host host)
         {
             return null;
         }

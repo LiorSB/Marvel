@@ -17,7 +17,7 @@ namespace Marvel.Commands
             throw new System.NotImplementedException();
         }
 
-        public string GetSystemInformation(string ip)
+        public string GetSystemInformation(Host host)
         {
             string cmdOutPut = "";
 
@@ -26,7 +26,7 @@ namespace Marvel.Commands
                 StartInfo = new ProcessStartInfo
                 {
                     FileName = "cmd.exe",
-                    Arguments = @"/C systeminfo /s " + ip,
+                    Arguments = @$"/C systeminfo /s {host.IP} /u {host.Username} /p {host.Password}",
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     CreateNoWindow = true
@@ -47,6 +47,11 @@ namespace Marvel.Commands
             catch (Exception e)
             {
                 return e.Message;
+            }
+
+            if (string.IsNullOrEmpty(cmdOutPut))
+            {
+                cmdOutPut += "ERROR: The RPC server is unavailable.";
             }
 
             return cmdOutPut;

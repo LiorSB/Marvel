@@ -1,5 +1,6 @@
 ﻿using Marvel.Model;
 using Prism.Commands;
+using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
@@ -8,6 +9,7 @@ namespace Marvel.ViewModel
     public class EditHostViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
+        public event EventHandler RequestClose;
         private string _ipEdited = "";
         private string _usernameEdited = "";
         private string _passwordEdited = "";
@@ -93,6 +95,7 @@ namespace Marvel.ViewModel
             Host.IP = _ipEdited;
             Host.Username = _usernameEdited;
             Host.Password = _passwordEdited;
+            RequestClose?.Invoke(this, new EventArgs());
         }
     }
 }

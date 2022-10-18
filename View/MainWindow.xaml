@@ -4,6 +4,7 @@
 		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:converters="clr-namespace:Marvel.Converters"
+        xmlns:fa="http://schemas.fontawesome.io/icons/"
 		mc:Ignorable="d"
 		Title="MainWindow" Height="750" Width="700">
 	<Window.Resources>
@@ -21,7 +22,7 @@
 			<RowDefinition Height="100*"/>
 		</Grid.RowDefinitions>
 
-		<Menu Grid.Row="0" Grid.ColumnSpan="2147483647">
+		<!--<Menu Grid.Row="0" Grid.ColumnSpan="2147483647">
 			<MenuItem Header="_Scan">
 				<MenuItem Header="_Save" Command="ApplicationCommands.Save"/>
 			</MenuItem>
@@ -29,7 +30,7 @@
 				<MenuItem Header="_Edit IP"/>
 				<MenuItem Header="_Delete IP"/>
 			</MenuItem>
-		</Menu>
+		</Menu>-->
 
 		<TextBlock Grid.Row="1" Text="Add IPs to Scan:" FontSize="18" FontWeight="Bold" TextAlignment="Center"/>
 
@@ -65,7 +66,7 @@
 				<TextBlock Grid.Row="2" Grid.Column="0" Text="Password:"/>
 				<PasswordBox Grid.Row="2" Grid.Column="2" Name="HostPasswordBox" PasswordChanged="PasswordBox_PasswordChanged"/>
 
-				<Button Grid.Row="3" Grid.ColumnSpan="2147483647" Content="Add Host" Command="{Binding AddHostCommand}"/>
+                <Button Grid.Row="3" Grid.Column="2" Grid.ColumnSpan="2147483647" Padding="5" BorderThickness="2" Content="Add Host" Command="{Binding AddHostCommand}"/>
 			</Grid>
 
 			<!--Segment, Local IP Scanner and Add Hosts From a File-->
@@ -87,9 +88,9 @@
 				<TextBox Grid.Row="0" Grid.Column="2" Text="{Binding Segment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 				<Button Grid.Row="0" Grid.Column="5" Content="Scan Segment" Command="{Binding AddHostCommand}"/>-->
 
-				<Button Grid.Row="1" Grid.ColumnSpan="2147483647" Content="Scan For Local IPs" Command="{Binding ScanForLocalIPsCommand}"/>
+                <Button Grid.Row="0" Grid.ColumnSpan="2147483647" Padding="10" BorderThickness="2" Margin="5" Content="Scan For Local IPs" Command="{Binding ScanForLocalIPsCommand}"/>
 
-				<Button Grid.Row="2" Grid.ColumnSpan="2147483647" Content="Add Hosts From a File" Click="Button_AddHostsFromFile" Command="{Binding AddHostsFromFileCommand}"/>
+                <Button Grid.Row="1" Grid.ColumnSpan="2147483647" Padding="10" BorderThickness="2" Margin="5" Content="Add Hosts From a File" Click="Button_AddHostsFromFile" Command="{Binding AddHostsFromFileCommand}"/>
 			</Grid>
 		</Grid>
 
@@ -142,8 +143,43 @@
 				</TextBox.IsEnabled>
 			</TextBox> 
 
-			<Button Grid.Row="4" Grid.Column="0" Content="Cancel" Command="{Binding CancelCommand}"/>
-			<Button Grid.Row="4" Grid.Column="1" Content="Run Command" Command="{Binding RunCommandCommand}"/>
+			<!--<Button Grid.Row="4" Grid.Column="0" Content="Cancel" Command="{Binding CancelCommand}"/>-->
+            <Button Grid.Row="4" Grid.Column="1" Padding="5" BorderThickness="2" Command="{Binding RunCommandCommand}">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="IsEnabled" Value="True"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Path=IsRunningCommand}" Value="True">
+                                <Setter Property="IsEnabled" Value="False"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+                <Button.Content>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid Grid.Column="0" Margin="0,0,10,0">
+                            <fa:ImageAwesome Icon="CircleOutlineNotch" Spin="True" Height="15" Width="15">
+                                <fa:ImageAwesome.Style>
+                                    <Style TargetType="{x:Type fa:ImageAwesome}">
+                                        <Setter Property="Visibility" Value="Hidden"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Path=IsRunningCommand}" Value="True">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </fa:ImageAwesome.Style>
+                            </fa:ImageAwesome>
+                        </Grid>
+                        <TextBlock Text="Run Command" Grid.Column="1"/>
+                    </Grid>
+                </Button.Content>
+            </Button>
+            
 		</Grid>
 
 		<!--Results Information-->
