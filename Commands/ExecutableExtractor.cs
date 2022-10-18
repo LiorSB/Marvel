@@ -131,9 +131,9 @@ namespace Marvel.Commands
 
             DirectoryInfo hostDirectoryInfo = Directory.CreateDirectory(path);
 
-            //PrefetchExtractor(host, path, selectedProtocol);
+            PrefetchExtractor(host, path, selectedProtocol);
             //AmcacheExtractor(host, path, selectedProtocol); // Bugged: Hive files can't be open for read, because they are locked by another resource.
-            //JumpListExtractor(host, path, selectedProtocol);
+            JumpListExtractor(host, path, selectedProtocol);
             //ShimcacheExtractor(host, path, selectedProtocol);
             SrumExtractor(host, path, selectedProtocol);
 
