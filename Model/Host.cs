@@ -73,11 +73,8 @@ namespace Marvel.Model
             }
             set
             {
-                lock (_synchronizeAccess)
-                {
-                    _details = value;
-                    NotifyPropertyChanged();
-                }
+                _details = value;
+                NotifyPropertyChanged();
             }
         }
         public string PortsConnectivity
@@ -88,11 +85,8 @@ namespace Marvel.Model
             }
             set
             {
-                lock (_synchronizeAccess)
-                {
-                    _portsConnectivity = value;
-                    NotifyPropertyChanged();
-                }
+                _portsConnectivity = value;
+                NotifyPropertyChanged();
             }
         }
         public string SystemInformation
@@ -103,11 +97,8 @@ namespace Marvel.Model
             }
             set
             {
-                lock (_synchronizeAccess)
-                {
-                    _systemInformation = value;
-                    NotifyPropertyChanged();
-                }
+                _systemInformation = value;
+                 NotifyPropertyChanged();
             }
         }
 
@@ -144,6 +135,14 @@ namespace Marvel.Model
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public void UpdateHostDetails(string message)
+        {
+            lock (_synchronizeAccess)
+            {
+                this.Details += message;
+            }
         }
     }
 }

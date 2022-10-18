@@ -28,6 +28,14 @@ namespace SrumData
             var tempVal = ExeInfo.Substring(2); //strip !!
             var segs = tempVal.Split('!');
 
+            if (segs[1] == ".exe")
+            {
+                segs[0] += "!" + segs[1];
+                segs[1] = segs[2];
+                segs[2] = segs[3];
+                segs[3] = segs[4];
+            }
+
             ExeInfo = segs[0];
 
             Unknown = segs[2];

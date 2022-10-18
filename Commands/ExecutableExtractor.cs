@@ -131,9 +131,9 @@ namespace Marvel.Commands
 
             DirectoryInfo hostDirectoryInfo = Directory.CreateDirectory(path);
 
-            PrefetchExtractor(host, path, selectedProtocol);
+            //PrefetchExtractor(host, path, selectedProtocol);
             //AmcacheExtractor(host, path, selectedProtocol); // Bugged: Hive files can't be open for read, because they are locked by another resource.
-            JumpListExtractor(host, path, selectedProtocol);
+            //JumpListExtractor(host, path, selectedProtocol);
             //ShimcacheExtractor(host, path, selectedProtocol);
             SrumExtractor(host, path, selectedProtocol);
 
@@ -543,7 +543,7 @@ namespace Marvel.Commands
                 }
                 catch (Exception e)
                 {
-                    host.Details = $"Error exporting 'EnergyUsage' data! Error: {e.Message}";
+                    host.UpdateHostDetails($"Error exporting 'EnergyUsage' data! Error: {e.Message}");
                 }
 
                 try
@@ -572,7 +572,7 @@ namespace Marvel.Commands
                 }
                 catch (Exception e)
                 {
-                    host.Details = $"Error exporting 'Unknown312' data! Error: {e.Message}";
+                    host.UpdateHostDetails($"Error exporting 'Unknown312' data! Error: {e.Message}");
                 }
 
                 try
@@ -603,7 +603,7 @@ namespace Marvel.Commands
                 }
                 catch (Exception e)
                 {
-                    host.Details = $"Error exporting 'UnknownD8F' data! Error: {e.Message}";
+                    host.UpdateHostDetails($"Error exporting 'UnknownD8F' data! Error: {e.Message}");
                 }
 
                 try
@@ -630,7 +630,7 @@ namespace Marvel.Commands
                 }
                 catch (Exception e)
                 {
-                    host.Details = $"Error exporting 'AppResourceUseInfo' data! Error: {e.Message}";
+                    host.UpdateHostDetails($"Error exporting 'AppResourceUseInfo' data! Error: {e.Message}");
                 }
 
                 try
@@ -660,7 +660,7 @@ namespace Marvel.Commands
                 }
                 catch (Exception e)
                 {
-                    host.Details = $"Error exporting 'NetworkConnection' data! Error: {e.Message}";
+                    host.UpdateHostDetails($"Error exporting 'NetworkConnection' data! Error: {e.Message}");
                 }
 
                 try
@@ -687,7 +687,7 @@ namespace Marvel.Commands
                 }
                 catch (Exception e)
                 {
-                    host.Details = $"Error exporting 'NetworkUsage' data! Error: {e.Message}";
+                    host.UpdateHostDetails($"Error exporting 'NetworkUsage' data! Error: {e.Message}");
                 }
 
                 try
@@ -714,7 +714,7 @@ namespace Marvel.Commands
                 }
                 catch (Exception e)
                 {
-                    host.Details = $"Error exporting 'PushNotification' data! Error: {e.Message}";
+                    host.UpdateHostDetails($"Error exporting 'PushNotification' data! Error: {e.Message}");
                 }
             }
 
