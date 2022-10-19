@@ -8,6 +8,7 @@ using System.Text;
 using Microsoft.Isam.Esent.Interop;
 using Registry;
 using Serilog;
+using ServiceStack;
 using ServiceStack.Text;
 
 namespace SrumData
@@ -28,20 +29,32 @@ namespace SrumData
             var tempVal = ExeInfo.Substring(2); //strip !!
             var segs = tempVal.Split('!');
 
-            if (segs[1] == ".exe")
+            if (segs.Length < 4)
             {
-                segs[0] += "!" + segs[1];
-                segs[1] = segs[2];
-                segs[2] = segs[3];
-                segs[3] = segs[4];
+                return;
             }
 
             ExeInfo = segs[0];
+            int segsLength = segs.Length;
 
-            Unknown = segs[2];
-            ExeInfoDescription = segs[3];
+            // Incase the filename had "!" in it, append everything back up untill the file type extension.
+            for (int i = 1; i < segsLength - 3; i++)
+            {
+                // If the string is empty it means there were several "!", else append "!<originalValue>"
+                if (segs[i].IsNullOrEmpty())
+                {
+                    ExeInfo += "!";
+                }
+                else
+                {
+                    ExeInfo += "!" + segs[i];
+                }
+            }
 
-            Timestamp = DateTimeOffset.ParseExact(segs[1], "yyyy/MM/dd:HH:mm:ss", null,
+            Unknown = segs[segsLength - 2];
+            ExeInfoDescription = segs[segsLength - 1];
+
+            Timestamp = DateTimeOffset.ParseExact(segs[segsLength - 3], "yyyy/MM/dd:HH:mm:ss", null,
                 DateTimeStyles.AssumeUniversal);
         }
 
