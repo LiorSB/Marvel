@@ -1,5 +1,5 @@
 # Marvel
-A demo for the program can be seen in the file `MarvelDemo.mp4`
+A demo for the program can be seen in the file [MarvelDemo.mp4](https://github.com/LiorSB/Marvel/blob/master/MarvelDemo.mp4)
 
 ## Project Background
 Marvel is a desktop application that can scan and parse artifacts to extract executables from remote computers through communication protocols. The  user can add hosts manually, from a file or automatically scan for local hosts and get information about their connectivity, OS and ports. The user can execute commands, transfer files and get information about directories from remote computers with the help of the communication protocols WinRM, SSH, SMB and WMI. Once a connection is made, The user can set Marvel to scan and parse every remote computer for artifacts according to "Windows Artifacts Analysis Program Execution" with the help of EZTools to get the paths of executable files, which will be extracted to the main machine computer.
