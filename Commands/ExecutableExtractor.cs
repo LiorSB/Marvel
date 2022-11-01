@@ -476,7 +476,7 @@ namespace Marvel.Commands
         public string ShimcacheExtractor(Host host, string toDirectory, ProtocolsEnum selectedProtocol)
         {
             Directory.CreateDirectory(REMOTE_SHIMCACHE_FOLDER);
-            File.WriteAllBytes($"{REMOTE_SHIMCACHE_FOLDER}/AppCompatCacheParser.zip" , FileStore.Resource.AppCompatCacheParser);
+            //File.WriteAllBytes($"{REMOTE_SHIMCACHE_FOLDER}/AppCompatCacheParser.zip" , FileStore.Resource.AppCompatCacheParser);
             return "";
         }
 
